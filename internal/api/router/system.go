@@ -16,6 +16,7 @@ func RegisterSystemRoutes(engine *gin.Engine,
 	deptHandler *handler.DeptHandler,
 	postHandler *handler.PostHandler,
 	roleHandler *handler.RoleHandler,
+	menuHandler *handler.MenuHandler,
 	permissionHandler *handler.PermissionHandler,
 	noticeHandler *handler.NoticeHandler,
 	loginLogHandler *handler.LoginLogHandler,
@@ -32,6 +33,10 @@ func RegisterSystemRoutes(engine *gin.Engine,
 	apiErrorLogHandler *handler.ApiErrorLogHandler,
 	socialClientHandler *handler.SocialClientHandler,
 	socialUserHandler *handler.SocialUserHandler,
+	sensitiveWordHandler *handler.SensitiveWordHandler,
+	mailHandler *handler.MailHandler,
+	notifyHandler *handler.NotifyHandler,
+	oauth2ClientHandler *handler.OAuth2ClientHandler,
 ) {
 	api := engine.Group("/admin-api")
 	{
@@ -54,8 +59,7 @@ func RegisterSystemRoutes(engine *gin.Engine,
 				authGroup.GET("/get-permission-info", authHandler.GetPermissionInfo)
 			}
 
-			// Tenant (No Auth needed for simple list? Usually Tenant mgmt needs auth. Checked Java: @PreAuthorize)
-			// Assuming Auth middleware is applied to systemGroup, so we just add routes.
+			// Tenant
 			tenantGroup := systemGroup.Group("/tenant")
 			{
 				tenantGroup.GET("/simple-list", tenantHandler.GetTenantSimpleList)
@@ -156,6 +160,17 @@ func RegisterSystemRoutes(engine *gin.Engine,
 				permGroup.POST("/assign-user-role", permissionHandler.AssignUserRole)
 			}
 
+			// Menu
+			menuGroup := systemGroup.Group("/menu")
+			{
+				menuGroup.POST("/create", menuHandler.CreateMenu)
+				menuGroup.PUT("/update", menuHandler.UpdateMenu)
+				menuGroup.DELETE("/delete", menuHandler.DeleteMenu)
+				menuGroup.GET("/list", menuHandler.GetMenuList)
+				menuGroup.GET("/get", menuHandler.GetMenu)
+				menuGroup.GET("/simple-list", menuHandler.GetSimpleMenuList)
+			}
+
 			// Notice
 			noticeGroup := systemGroup.Group("/notice")
 			{
@@ -177,6 +192,77 @@ func RegisterSystemRoutes(engine *gin.Engine,
 			operateLogGroup := systemGroup.Group("/operate-log")
 			{
 				operateLogGroup.GET("/page", operateLogHandler.GetOperateLogPage)
+			}
+
+			// Sensitive Word
+			sensitiveWordGroup := systemGroup.Group("/sensitive-word")
+			{
+				sensitiveWordGroup.POST("/create", sensitiveWordHandler.CreateSensitiveWord)
+				sensitiveWordGroup.PUT("/update", sensitiveWordHandler.UpdateSensitiveWord)
+				sensitiveWordGroup.DELETE("/delete", sensitiveWordHandler.DeleteSensitiveWord)
+				sensitiveWordGroup.GET("/get", sensitiveWordHandler.GetSensitiveWord)
+				sensitiveWordGroup.GET("/page", sensitiveWordHandler.GetSensitiveWordPage)
+				sensitiveWordGroup.GET("/validate-text", sensitiveWordHandler.ValidateSensitiveWord)
+				sensitiveWordGroup.GET("/export-excel", sensitiveWordHandler.ExportSensitiveWord)
+			}
+
+			// Mail Account
+			mailAccountGroup := systemGroup.Group("/mail/account")
+			{
+				mailAccountGroup.POST("/create", mailHandler.CreateMailAccount)
+				mailAccountGroup.PUT("/update", mailHandler.UpdateMailAccount)
+				mailAccountGroup.DELETE("/delete", mailHandler.DeleteMailAccount)
+				mailAccountGroup.GET("/get", mailHandler.GetMailAccount)
+				mailAccountGroup.GET("/page", mailHandler.GetMailAccountPage)
+				mailAccountGroup.GET("/list-all-simple", mailHandler.GetSimpleMailAccountList)
+			}
+
+			// Mail Template
+			mailTemplateGroup := systemGroup.Group("/mail/template")
+			{
+				mailTemplateGroup.POST("/create", mailHandler.CreateMailTemplate)
+				mailTemplateGroup.PUT("/update", mailHandler.UpdateMailTemplate)
+				mailTemplateGroup.DELETE("/delete", mailHandler.DeleteMailTemplate)
+				mailTemplateGroup.GET("/get", mailHandler.GetMailTemplate)
+				mailTemplateGroup.GET("/page", mailHandler.GetMailTemplatePage)
+				mailTemplateGroup.POST("/send-mail", mailHandler.SendMail) // Logic for testing send
+			}
+
+			// Mail Log
+			mailLogGroup := systemGroup.Group("/mail/log")
+			{
+				mailLogGroup.GET("/page", mailHandler.GetMailLogPage)
+			}
+
+			// Notify Template
+			notifyTemplateGroup := systemGroup.Group("/notify-template")
+			{
+				notifyTemplateGroup.POST("/create", notifyHandler.CreateNotifyTemplate)
+				notifyTemplateGroup.PUT("/update", notifyHandler.UpdateNotifyTemplate)
+				notifyTemplateGroup.DELETE("/delete", notifyHandler.DeleteNotifyTemplate)
+				notifyTemplateGroup.GET("/get", notifyHandler.GetNotifyTemplate)
+				notifyTemplateGroup.GET("/page", notifyHandler.GetNotifyTemplatePage)
+				notifyTemplateGroup.POST("/send-notify", notifyHandler.SendNotify)
+			}
+
+			// Notify Message
+			notifyMessageGroup := systemGroup.Group("/notify-message")
+			{
+				notifyMessageGroup.GET("/get-unread-count", notifyHandler.GetUnreadNotifyMessageCount)
+				notifyMessageGroup.GET("/my-page", notifyHandler.GetMyNotifyMessagePage)
+				notifyMessageGroup.GET("/page", notifyHandler.GetNotifyMessagePage)
+				notifyMessageGroup.PUT("/update-read", notifyHandler.UpdateNotifyMessageRead)
+				notifyMessageGroup.PUT("/update-all-read", notifyHandler.UpdateAllNotifyMessageRead)
+			}
+
+			// OAuth2 Client
+			oauth2ClientGroup := systemGroup.Group("/oauth2-client")
+			{
+				oauth2ClientGroup.POST("/create", oauth2ClientHandler.CreateOAuth2Client)
+				oauth2ClientGroup.PUT("/update", oauth2ClientHandler.UpdateOAuth2Client)
+				oauth2ClientGroup.DELETE("/delete", oauth2ClientHandler.DeleteOAuth2Client)
+				oauth2ClientGroup.GET("/get", oauth2ClientHandler.GetOAuth2Client)
+				oauth2ClientGroup.GET("/page", oauth2ClientHandler.GetOAuth2ClientPage)
 			}
 		}
 

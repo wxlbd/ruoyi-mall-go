@@ -31,6 +31,7 @@ func InitRouter(db *gorm.DB, rdb *redis.Client,
 	deptHandler *handler.DeptHandler,
 	postHandler *handler.PostHandler,
 	roleHandler *handler.RoleHandler,
+	menuHandler *handler.MenuHandler,
 	permissionHandler *handler.PermissionHandler,
 	noticeHandler *handler.NoticeHandler,
 	configHandler *handler.ConfigHandler,
@@ -97,6 +98,10 @@ func InitRouter(db *gorm.DB, rdb *redis.Client,
 	apiErrorLogHandler *handler.ApiErrorLogHandler,
 	socialClientHandler *handler.SocialClientHandler,
 	socialUserHandler *handler.SocialUserHandler,
+	sensitiveWordHandler *handler.SensitiveWordHandler,
+	mailHandler *handler.MailHandler,
+	notifyHandler *handler.NotifyHandler,
+	oauth2ClientHandler *handler.OAuth2ClientHandler, // Added OAuth2ClientHandler
 	appBargainActivityHandler *promotionApp.AppBargainActivityHandler,
 	appBargainRecordHandler *promotionApp.AppBargainRecordHandler,
 	appBargainHelpHandler *promotionApp.AppBargainHelpHandler,
@@ -143,14 +148,15 @@ func InitRouter(db *gorm.DB, rdb *redis.Client,
 	// ========== 模块化路由注册 ==========
 
 	// System 模块 (Auth, Tenant, Dict, Dept, Post, User, Role, Permission, Logs, SMS, File, Infra)
+	// System 模块 (Auth, Tenant, Dict, Dept, Post, User, Role, Permission, Logs, SMS, File, Infra)
 	RegisterSystemRoutes(r,
 		authHandler, userHandler, tenantHandler, dictHandler, deptHandler,
-		postHandler, roleHandler, permissionHandler, noticeHandler,
+		postHandler, roleHandler, menuHandler, permissionHandler, noticeHandler,
 		loginLogHandler, operateLogHandler, configHandler,
 		smsChannelHandler, smsTemplateHandler, smsLogHandler,
 		fileConfigHandler, fileHandler,
 		jobHandler, jobLogHandler, apiAccessLogHandler, apiErrorLogHandler,
-		socialClientHandler, socialUserHandler,
+		socialClientHandler, socialUserHandler, sensitiveWordHandler, mailHandler, notifyHandler, oauth2ClientHandler,
 	)
 
 	// Product 模块

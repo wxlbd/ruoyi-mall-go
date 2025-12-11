@@ -75,6 +75,10 @@ func InitApp() (*gin.Engine, error) {
 		service.NewApiErrorLogService,          // Added ApiErrorLogService
 		service.NewSocialClientService,         // Added SocialClientService
 		service.NewSocialUserService,           // Added SocialUserService
+		service.NewSensitiveWordService,        // Added SensitiveWordService
+		service.NewMailService,                 // Added MailService
+		service.NewNotifyService,               // Added NotifyService
+		service.NewOAuth2ClientService,         // Added OAuth2ClientService
 		memberSvc.NewMemberAuthService,         // Added MemberAuthService
 		memberSvc.NewMemberUserService,         // Added MemberUserService
 		memberSvc.NewMemberAddressService,      // Added MemberAddressService
@@ -104,6 +108,7 @@ func InitApp() (*gin.Engine, error) {
 		handler.NewDeptHandler,
 		handler.NewPostHandler,
 		handler.NewRoleHandler,
+		handler.NewMenuHandler, // Added MenuHandler
 		handler.NewPermissionHandler,
 		handler.NewNoticeHandler,
 		handler.NewConfigHandler,
@@ -121,6 +126,10 @@ func InitApp() (*gin.Engine, error) {
 		handler.NewApiErrorLogHandler,   // Added ApiErrorLogHandler
 		handler.NewSocialClientHandler,  // Added SocialClientHandler
 		handler.NewSocialUserHandler,    // Added SocialUserHandler
+		handler.NewSensitiveWordHandler, // Added SensitiveWordHandler
+		handler.NewMailHandler,          // Added MailHandler
+		handler.NewNotifyHandler,        // Added NotifyHandler
+		handler.NewOAuth2ClientHandler,  // Added OAuth2ClientHandler
 		// Member
 		memberAdmin.NewMemberLevelHandler,             // Added MemberLevelHandler for admin
 		memberAdmin.NewMemberGroupHandler,             // Added MemberGroupHandler for admin
