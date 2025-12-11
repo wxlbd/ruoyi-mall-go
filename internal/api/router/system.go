@@ -54,12 +54,19 @@ func RegisterSystemRoutes(engine *gin.Engine,
 				authGroup.GET("/get-permission-info", authHandler.GetPermissionInfo)
 			}
 
-			// Tenant (No Auth needed for simple list)
+			// Tenant (No Auth needed for simple list? Usually Tenant mgmt needs auth. Checked Java: @PreAuthorize)
+			// Assuming Auth middleware is applied to systemGroup, so we just add routes.
 			tenantGroup := systemGroup.Group("/tenant")
 			{
 				tenantGroup.GET("/simple-list", tenantHandler.GetTenantSimpleList)
 				tenantGroup.GET("/get-by-website", tenantHandler.GetTenantByWebsite)
 				tenantGroup.GET("/get-id-by-name", tenantHandler.GetTenantIdByName)
+				tenantGroup.POST("/create", tenantHandler.CreateTenant)
+				tenantGroup.PUT("/update", tenantHandler.UpdateTenant)
+				tenantGroup.DELETE("/delete", tenantHandler.DeleteTenant)
+				tenantGroup.GET("/get", tenantHandler.GetTenant)
+				tenantGroup.GET("/page", tenantHandler.GetTenantPage)
+				tenantGroup.GET("/export-excel", tenantHandler.ExportTenantExcel)
 			}
 
 			// Dict Type
@@ -113,12 +120,17 @@ func RegisterSystemRoutes(engine *gin.Engine,
 			userGroup := systemGroup.Group("/user")
 			{
 				userGroup.GET("/page", userHandler.GetUserPage)
+				userGroup.GET("/list-all-simple", userHandler.GetSimpleUserList)
+				userGroup.GET("/simple-list", userHandler.GetSimpleUserList)
 				userGroup.GET("/get", userHandler.GetUser)
 				userGroup.POST("/create", userHandler.CreateUser)
 				userGroup.PUT("/update", userHandler.UpdateUser)
 				userGroup.DELETE("/delete", userHandler.DeleteUser)
 				userGroup.PUT("/update-status", userHandler.UpdateUserStatus)
 				userGroup.PUT("/update-password", userHandler.UpdateUserPassword)
+				userGroup.GET("/export", userHandler.ExportUser)
+				userGroup.GET("/get-import-template", userHandler.GetImportTemplate)
+				userGroup.POST("/import", userHandler.ImportUser)
 			}
 
 			// Role

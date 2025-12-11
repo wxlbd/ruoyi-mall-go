@@ -49,3 +49,12 @@ func SetLoginUser(c *gin.Context, user *LoginUser) {
 		c.Set(CtxLoginUserKey, user)
 	}
 }
+
+// GetTenantId 获得租户编号
+func GetTenantId(c *gin.Context) int64 {
+	user := GetLoginUser(c)
+	if user == nil {
+		return 0
+	}
+	return user.TenantID
+}

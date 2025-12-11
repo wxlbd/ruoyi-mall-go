@@ -77,8 +77,14 @@ func (s *ProductCategoryService) DeleteCategory(ctx context.Context, id int64) e
 	if count > 0 {
 		return core.NewBizError(1006001001, "存在子分类，无法删除")
 	}
-	// TODO: 校验是否绑定了 SPU (product_spu table check)
-	// For now, assume no binding check or implement simple check if SPU model exists later.
+	// 校验是否绑定了 SPU
+	spuCount, err := s.q.ProductSpu.WithContext(ctx).Where(s.q.ProductSpu.CategoryID.Eq(id)).Count()
+	if err != nil {
+		return err
+	}
+	if spuCount > 0 {
+		return core.NewBizError(1006001004, "存在商品绑定，无法删除")
+	}
 
 	_, err = s.q.ProductCategory.WithContext(ctx).Where(s.q.ProductCategory.ID.Eq(id)).Delete()
 	return err

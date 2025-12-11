@@ -38,7 +38,14 @@ func NewAuthService(
 // GetPermissionInfo 获取登录用户的权限信息
 func (s *AuthService) GetPermissionInfo(ctx context.Context) (*resp.AuthPermissionInfoResp, error) {
 	// 1. 获取当前用户 ID (从 Context)
-	userId := ctx.Value(core.CtxUserIDKey).(int64)
+	userIdVal := ctx.Value(core.CtxUserIDKey)
+	if userIdVal == nil {
+		return nil, core.NewBizError(401, "未登录")
+	}
+	userId, ok := userIdVal.(int64)
+	if !ok {
+		return nil, core.NewBizError(401, "用户标识无效")
+	}
 
 	// 2. 获取用户信息
 	uRepo := s.repo.SystemUser
@@ -59,9 +66,12 @@ func (s *AuthService) GetPermissionInfo(ctx context.Context) (*resp.AuthPermissi
 	if err != nil {
 		return nil, err
 	}
+	// 过滤禁用的角色 (Java: roles.removeIf(role -> !CommonStatusEnum.ENABLE.getStatus().equals(role.getStatus())))
 	var roles []string
 	for _, r := range rolesData {
-		roles = append(roles, r.Code)
+		if r.Status == 0 { // 0 = ENABLE
+			roles = append(roles, r.Code)
+		}
 	}
 
 	// 4. 获取角色菜单
@@ -76,16 +86,24 @@ func (s *AuthService) GetPermissionInfo(ctx context.Context) (*resp.AuthPermissi
 		return nil, err
 	}
 
+	// 5.1 过滤禁用的菜单 (Java: menuList = menuService.filterDisableMenus(menuList))
+	var enabledMenus []*resp.MenuResp
+	for _, m := range menus {
+		if m.Status == 0 { // 0 = ENABLE
+			enabledMenus = append(enabledMenus, m)
+		}
+	}
+
 	// 6. 获取角色权限 (从菜单中提取)
 	permissions := make([]string, 0)
-	for _, m := range menus {
+	for _, m := range enabledMenus {
 		if m.Permission != "" {
 			permissions = append(permissions, m.Permission)
 		}
 	}
 
 	// 7. 构建菜单树
-	menuTree := s.menuSvc.BuildMenuTree(menus)
+	menuTree := s.menuSvc.BuildMenuTree(enabledMenus)
 
 	return &resp.AuthPermissionInfoResp{
 		User: resp.UserVO{

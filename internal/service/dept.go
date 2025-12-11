@@ -81,7 +81,14 @@ func (s *DeptService) DeleteDept(ctx context.Context, id int64) error {
 	if count > 0 {
 		return errors.New("存在子部门，无法删除")
 	}
-	// TODO: Check users assigned to this dept
+	// Check users assigned to this dept
+	userCount, err := s.q.SystemUser.WithContext(ctx).Where(s.q.SystemUser.DeptID.Eq(id)).Count()
+	if err != nil {
+		return err
+	}
+	if userCount > 0 {
+		return errors.New("部门下存在用户，无法删除")
+	}
 
 	_, err = d.WithContext(ctx).Where(d.ID.Eq(id)).Delete()
 	return err

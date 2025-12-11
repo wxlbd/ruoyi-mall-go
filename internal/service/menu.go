@@ -171,6 +171,12 @@ func (s *MenuService) BuildMenuTree(menus []*resp.MenuResp) []resp.MenuVO {
 func (s *MenuService) buildTreeRecursive(list []*resp.MenuResp, parentId int64) []resp.MenuVO {
 	var tree []resp.MenuVO
 	for _, item := range list {
+		// 过滤按钮类型 (type=3), 只保留目录(type=1)和菜单(type=2)
+		// Java: MenuTypeEnum.BUTTON = 3, 在 convert 时被过滤
+		if item.Type == 3 {
+			continue
+		}
+
 		if item.ParentID == parentId {
 			node := resp.MenuVO{
 				ID:            item.ID,

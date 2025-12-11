@@ -108,7 +108,14 @@ func (s *RoleService) DeleteRole(ctx context.Context, id int64) error {
 	if role.Type == 1 {
 		return errors.New("内置角色不能删除")
 	}
-	// TODO: Check assigned users count
+	// Check assigned users count
+	userRoleCount, err := s.q.SystemUserRole.WithContext(ctx).Where(s.q.SystemUserRole.RoleID.Eq(id)).Count()
+	if err != nil {
+		return err
+	}
+	if userRoleCount > 0 {
+		return errors.New("角色已分配给用户，无法删除")
+	}
 	_, err = r.WithContext(ctx).Where(r.ID.Eq(id)).Delete()
 	return err
 }

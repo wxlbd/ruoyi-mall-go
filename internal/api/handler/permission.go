@@ -11,12 +11,14 @@ import (
 )
 
 type PermissionHandler struct {
-	svc *service.PermissionService
+	svc       *service.PermissionService
+	tenantSvc *service.TenantService
 }
 
-func NewPermissionHandler(svc *service.PermissionService) *PermissionHandler {
+func NewPermissionHandler(svc *service.PermissionService, tenantSvc *service.TenantService) *PermissionHandler {
 	return &PermissionHandler{
-		svc: svc,
+		svc:       svc,
+		tenantSvc: tenantSvc,
 	}
 }
 
@@ -37,7 +39,29 @@ func (h *PermissionHandler) AssignRoleMenu(c *gin.Context) {
 		c.JSON(200, core.ErrParam)
 		return
 	}
-	// TODO: Filter menus by tenant if needed
+	// Filter menus by tenant
+	err := h.tenantSvc.HandleTenantMenu(c, func(allowedMenuIds []int64) {
+		if allowedMenuIds == nil {
+			return
+		}
+		// Filter r.MenuIDs
+		allowedSet := make(map[int64]bool)
+		for _, id := range allowedMenuIds {
+			allowedSet[id] = true
+		}
+		filtered := make([]int64, 0, len(r.MenuIDs))
+		for _, id := range r.MenuIDs {
+			if allowedSet[id] {
+				filtered = append(filtered, id)
+			}
+		}
+		r.MenuIDs = filtered
+	})
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
 	if err := h.svc.AssignRoleMenu(c.Request.Context(), r.RoleID, r.MenuIDs); err != nil {
 		c.Error(err)
 		return
