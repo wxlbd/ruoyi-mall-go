@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"backend-go/internal/api/req"
 	"backend-go/internal/api/resp"
+	"backend-go/internal/model"
 	"backend-go/internal/repo/query"
 )
 
@@ -16,6 +18,138 @@ func NewMenuService(q *query.Query) *MenuService {
 	return &MenuService{
 		q: q,
 	}
+}
+
+// CreateMenu 创建菜单
+func (s *MenuService) CreateMenu(ctx context.Context, req *req.MenuCreateReq) (int64, error) {
+	// 校验父菜单存在
+	if err := s.checkParentMenu(ctx, req.ParentID); err != nil {
+		return 0, err
+	}
+	// 校验菜单名称唯一
+	if err := s.checkMenuNameUnique(ctx, req.Name, req.ParentID, 0); err != nil {
+		return 0, err
+	}
+
+	menu := &model.SystemMenu{
+		Name:          req.Name,
+		Permission:    req.Permission,
+		Type:          req.Type,
+		Sort:          req.Sort,
+		ParentID:      req.ParentID,
+		Path:          req.Path,
+		Icon:          req.Icon,
+		Component:     req.Component,
+		ComponentName: req.ComponentName,
+		Status:        req.Status,
+		Visible:       model.BitBool(req.Visible),
+		KeepAlive:     model.BitBool(req.KeepAlive),
+		AlwaysShow:    model.BitBool(req.AlwaysShow),
+	}
+
+	if err := s.q.SystemMenu.WithContext(ctx).Create(menu); err != nil {
+		return 0, err
+	}
+	return menu.ID, nil
+}
+
+// UpdateMenu 更新菜单
+func (s *MenuService) UpdateMenu(ctx context.Context, req *req.MenuUpdateReq) error {
+	m := s.q.SystemMenu
+	// 1. 校验存在
+	if _, err := m.WithContext(ctx).Where(m.ID.Eq(req.ID)).First(); err != nil {
+		return errors.New("菜单不存在")
+	}
+	// 2. 校验父菜单 (不能设置为自己)
+	if req.ParentID == req.ID {
+		return errors.New("父菜单不能是自己")
+	}
+	// 3. 校验父菜单存在
+	if err := s.checkParentMenu(ctx, req.ParentID); err != nil {
+		return err
+	}
+	// 4. 校验菜单名称唯一
+	if err := s.checkMenuNameUnique(ctx, req.Name, req.ParentID, req.ID); err != nil {
+		return err
+	}
+
+	// 5. 更新
+	_, err := m.WithContext(ctx).Where(m.ID.Eq(req.ID)).Updates(&model.SystemMenu{
+		Name:          req.Name,
+		Permission:    req.Permission,
+		Type:          req.Type,
+		Sort:          req.Sort,
+		ParentID:      req.ParentID,
+		Path:          req.Path,
+		Icon:          req.Icon,
+		Component:     req.Component,
+		ComponentName: req.ComponentName,
+		Status:        req.Status,
+		Visible:       model.BitBool(req.Visible),
+		KeepAlive:     model.BitBool(req.KeepAlive),
+		AlwaysShow:    model.BitBool(req.AlwaysShow),
+	})
+	return err
+}
+
+// DeleteMenu 删除菜单
+func (s *MenuService) DeleteMenu(ctx context.Context, id int64) error {
+	m := s.q.SystemMenu
+	// 1. 校验是否存在子菜单
+	count, err := m.WithContext(ctx).Where(m.ParentID.Eq(id)).Count()
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return errors.New("存在子菜单，无法删除")
+	}
+
+	// 2. 校验是否分配给角色
+	rm := s.q.SystemRoleMenu
+	countRole, err := rm.WithContext(ctx).Where(rm.MenuID.Eq(id)).Count()
+	if err != nil {
+		return err
+	}
+	if countRole > 0 {
+		return errors.New("菜单已分配给角色，无法删除")
+	}
+
+	// 3. 删除
+	_, err = m.WithContext(ctx).Where(m.ID.Eq(id)).Delete()
+	return err
+}
+
+// Helpers
+
+func (s *MenuService) checkParentMenu(ctx context.Context, parentId int64) error {
+	if parentId == 0 {
+		return nil
+	}
+	m := s.q.SystemMenu
+	count, err := m.WithContext(ctx).Where(m.ID.Eq(parentId)).Count()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return errors.New("父菜单不存在")
+	}
+	return nil
+}
+
+func (s *MenuService) checkMenuNameUnique(ctx context.Context, name string, parentId int64, excludeId int64) error {
+	m := s.q.SystemMenu
+	qb := m.WithContext(ctx).Where(m.Name.Eq(name), m.ParentID.Eq(parentId))
+	if excludeId > 0 {
+		qb = qb.Where(m.ID.Neq(excludeId))
+	}
+	count, err := qb.Count()
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return errors.New("菜单名称已存在")
+	}
+	return nil
 }
 
 // GetMenuList 获取菜单列表
