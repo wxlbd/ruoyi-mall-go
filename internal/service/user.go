@@ -22,6 +22,24 @@ func NewUserService(q *query.Query) *UserService {
 	}
 }
 
+// GetSimpleUserList 获取用户精简列表 (只包含启用用户)
+func (s *UserService) GetSimpleUserList(ctx context.Context) ([]resp.UserSimpleRespVO, error) {
+	u := s.q.SystemUser
+	list, err := u.WithContext(ctx).Where(u.Status.Eq(0)).Find() // 0 = Enabled
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]resp.UserSimpleRespVO, 0, len(list))
+	for _, user := range list {
+		result = append(result, resp.UserSimpleRespVO{
+			ID:       user.ID,
+			Nickname: user.Nickname,
+		})
+	}
+	return result, nil
+}
+
 // CreateUser 创建用户
 func (s *UserService) CreateUser(ctx context.Context, req *req.UserSaveReq) (int64, error) {
 	// 1. 校验唯一性
@@ -324,6 +342,78 @@ func (s *UserService) ResetUserPassword(ctx context.Context, req *req.UserResetP
 	}
 	_, err = u.WithContext(ctx).Where(u.ID.Eq(req.ID)).Update(u.Password, hashedPwd)
 	return err
+}
+
+// GetUserList 获得用户列表 (用于导出)
+func (s *UserService) GetUserList(ctx context.Context, req *req.UserExportReq) ([]*resp.UserRespVO, error) {
+	u := s.q.SystemUser
+	qb := u.WithContext(ctx)
+
+	if req.Username != "" {
+		qb = qb.Where(u.Username.Like("%" + req.Username + "%"))
+	}
+	if req.Mobile != "" {
+		qb = qb.Where(u.Mobile.Like("%" + req.Mobile + "%"))
+	}
+	if req.Status != nil {
+		qb = qb.Where(u.Status.Eq(int32(*req.Status)))
+	}
+	if req.DeptID > 0 {
+		qb = qb.Where(u.DeptID.Eq(req.DeptID))
+	}
+	if req.CreateTimeGe != nil {
+		qb = qb.Where(u.CreatedAt.Gte(*req.CreateTimeGe))
+	}
+	if req.CreateTimeLe != nil {
+		qb = qb.Where(u.CreatedAt.Lte(*req.CreateTimeLe))
+	}
+
+	list, err := qb.Order(u.ID).Find()
+	if err != nil {
+		return nil, err
+	}
+
+	var data []*resp.UserRespVO
+	for _, item := range list {
+		data = append(data, &resp.UserRespVO{
+			ID:         item.ID,
+			Username:   item.Username,
+			Nickname:   item.Nickname,
+			DeptID:     item.DeptID,
+			Email:      item.Email,
+			Mobile:     item.Mobile,
+			Sex:        item.Sex,
+			Avatar:     item.Avatar,
+			Status:     item.Status,
+			LoginIP:    item.LoginIP,
+			CreateTime: item.CreatedAt,
+		})
+	}
+	return data, nil
+}
+
+// GetImportTemplate 获得导入模板
+func (s *UserService) GetImportTemplate(ctx context.Context) ([]resp.UserImportExcelVO, error) {
+	return []resp.UserImportExcelVO{
+		{
+			Username: "zhangsan",
+			Nickname: "张三",
+			Email:    "zhangsan@yudao.cn",
+			Mobile:   "15601691300",
+			Sex:      "1",
+			Status:   "0",
+			DeptID:   100,
+		},
+		{
+			Username: "lisi",
+			Nickname: "李四",
+			Email:    "lisi@yudao.cn",
+			Mobile:   "15601691301",
+			Sex:      "2",
+			Status:   "0",
+			DeptID:   100,
+		},
+	}, nil
 }
 
 // Helpers

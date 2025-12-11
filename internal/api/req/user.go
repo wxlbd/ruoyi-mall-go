@@ -46,3 +46,12 @@ type UserResetPasswordReq struct {
 	ID       int64  `json:"id" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+type UserExportReq struct {
+	Username     string     `form:"username"`
+	Mobile       string     `form:"mobile"`
+	Status       *int       `form:"status"`
+	DeptID       int64      `form:"deptId"`
+	CreateTimeGe *time.Time `form:"createTime[0]"`
+	CreateTimeLe *time.Time `form:"createTime[1]"`
+}
