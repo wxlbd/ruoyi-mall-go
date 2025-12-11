@@ -152,7 +152,8 @@ func InitApp() (*gin.Engine, error) {
 		tradeSvc.NewTradePriceService,
 		tradeSvc.NewTradeOrderUpdateService,
 		tradeSvc.NewTradeAfterSaleService,
-		tradeSvc.NewTradeConfigService, // Added Config
+		tradeSvc.NewTradeConfigService,   // Added Config
+		tradeSvc.NewTradeOrderLogService, // Added Log
 		tradeApp.NewAppCartHandler,
 		tradeApp.NewAppTradeOrderHandler,
 		tradeApp.NewAppTradeAfterSaleHandler,
@@ -183,6 +184,7 @@ func InitApp() (*gin.Engine, error) {
 		// Statistics
 		repo.NewTradeStatisticsRepository,
 		repo.NewTradeOrderStatisticsRepository,
+		repo.NewTradeOrderLogRepository, // Added Log Repo
 		repo.NewAfterSaleStatisticsRepository,
 		repo.NewBrokerageStatisticsRepository,
 		repo.NewMemberStatisticsRepository,
