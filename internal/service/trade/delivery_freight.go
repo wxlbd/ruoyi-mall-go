@@ -308,3 +308,78 @@ func (s *DeliveryFreightTemplateService) convertAreaIDsToIntSlice(str string) []
 	}
 	return ids
 }
+
+// CalculateFreight 计算运费
+func (s *DeliveryFreightTemplateService) CalculateFreight(ctx context.Context, templateID int64, areaID int, count int) (int, error) {
+	if templateID == 0 {
+		return 0, nil
+	}
+	template, err := s.q.TradeDeliveryFreightTemplate.WithContext(ctx).Where(s.q.TradeDeliveryFreightTemplate.ID.Eq(templateID)).First()
+	if err != nil {
+		return 0, err
+	}
+	if template == nil {
+		return 0, nil
+	}
+
+	// 1. Check Free Shipping Rules
+	frees, err := s.q.TradeDeliveryFreightTemplateFree.WithContext(ctx).Where(s.q.TradeDeliveryFreightTemplateFree.TemplateID.Eq(templateID)).Find()
+	if err != nil {
+		return 0, err
+	}
+	for _, free := range frees {
+		ids := s.convertAreaIDsToIntSlice(free.AreaIDs)
+		if core.IntSliceContains(ids, areaID) {
+			if float64(count) >= free.FreeCount || (free.FreePrice > 0 && 0 >= free.FreePrice) { // Logic simplified for count only now
+				return 0, nil
+			}
+		}
+	}
+
+	// 2. Check Charge Rules
+	charges, err := s.q.TradeDeliveryFreightTemplateCharge.WithContext(ctx).Where(s.q.TradeDeliveryFreightTemplateCharge.TemplateID.Eq(templateID)).Find()
+	if err != nil {
+		return 0, err
+	}
+	// Find matching region rule, otherwise use default
+	var matchCharge *trade.TradeDeliveryFreightTemplateCharge
+	for _, charge := range charges {
+		ids := s.convertAreaIDsToIntSlice(charge.AreaIDs)
+		if core.IntSliceContains(ids, areaID) {
+			matchCharge = charge
+			break
+		}
+	}
+	// If no specific match, try to find default rule (usually 1 record with empty areaIDs)
+	if matchCharge == nil {
+		for _, charge := range charges {
+			if charge.AreaIDs == "" {
+				matchCharge = charge
+				break
+			}
+		}
+	}
+
+	if matchCharge == nil {
+		return 0, nil
+	}
+
+	// Calculate
+	price := matchCharge.StartPrice
+	if float64(count) > matchCharge.StartCount {
+		extraCount := float64(count) - matchCharge.StartCount
+		// Ceiling division for extra units
+		if matchCharge.ExtraCount == 0 {
+			matchCharge.ExtraCount = 1 // Avoid div by zero
+		}
+
+		div := extraCount / matchCharge.ExtraCount
+		units := int(div)
+		if float64(units)*matchCharge.ExtraCount < extraCount {
+			units++
+		}
+		price += units * matchCharge.ExtraPrice
+	}
+	return price, nil
+	return price, nil
+}
