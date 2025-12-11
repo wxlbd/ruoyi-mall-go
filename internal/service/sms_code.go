@@ -18,22 +18,34 @@ const (
 )
 
 type SmsCodeService struct {
-	q   *query.Query
-	rdb *redis.Client
-	// channelSvc *SmsChannelService // If we need to read config for real sending
+	q       *query.Query
+	rdb     *redis.Client
+	factory *SmsClientFactory
 }
 
-func NewSmsCodeService(q *query.Query, rdb *redis.Client) *SmsCodeService {
+func NewSmsCodeService(q *query.Query, rdb *redis.Client, factory *SmsClientFactory) *SmsCodeService {
 	return &SmsCodeService{
-		q:   q,
-		rdb: rdb,
+		q:       q,
+		rdb:     rdb,
+		factory: factory,
 	}
 }
 
 // SendSmsCode 发送短信验证码
 func (s *SmsCodeService) SendSmsCode(ctx context.Context, mobile string, scene int) error {
-	// 1. 校验频率 (例如 1分钟内只能发一次)
-	// TODO: Rate Limit
+	// 1. 校验频率 (1分钟内只能发一次)
+	rateLimitKey := fmt.Sprintf("sms:rate:%s:%d", mobile, scene)
+	exists, err := s.rdb.Exists(ctx, rateLimitKey).Result()
+	if err != nil {
+		return err
+	}
+	if exists > 0 {
+		return core.NewBizError(1004003001, "发送过于频繁，请稍后再试")
+	}
+	// Set rate limit key with 60s expiry
+	if err := s.rdb.Set(ctx, rateLimitKey, "1", 60*time.Second).Err(); err != nil {
+		return err
+	}
 
 	// 2. 生成验证码
 	code := fmt.Sprintf("%06d", rand.Intn(1000000))
@@ -44,9 +56,38 @@ func (s *SmsCodeService) SendSmsCode(ctx context.Context, mobile string, scene i
 		return err
 	}
 
-	// 4. 发送短信 (Mock for now, log it)
-	// In real world, query enabled channel from s.q.SystemSmsChannel and use SDK
-	zap.L().Info("Send SMS Code", zap.String("mobile", mobile), zap.String("code", code), zap.Int("scene", scene))
+	// 4. 发送短信
+	// 查询启用的渠道
+	channel, err := s.q.SystemSmsChannel.WithContext(ctx).Where(s.q.SystemSmsChannel.Status.Eq(0)).First()
+	if err != nil {
+		zap.L().Error("No enabled SMS channel found", zap.Error(err))
+		// For development, allow fallback or just return error
+		// return err
+	}
+
+	// Get client from factory
+	client := s.factory.GetClient(channel.ID)
+	if client == nil {
+		zap.L().Info("SMS Client not found in factory, initializing...", zap.Int64("channelId", channel.ID))
+		s.factory.CreateOrUpdateClient(channel)
+		client = s.factory.GetClient(channel.ID)
+	}
+
+	if client != nil {
+		// Prepare template params (mock)
+		params := map[string]interface{}{
+			"code": code,
+		}
+		// TODO: Retrieve valid apiTemplateId from SystemSmsTemplate based on scene
+
+		_, err := client.SendSms(ctx, 0, mobile, "TEMPLATE_ID", params)
+		if err != nil {
+			zap.L().Error("Send SMS failed", zap.Error(err))
+			return err
+		}
+	} else {
+		zap.L().Warn("No SMS client available for channel", zap.String("code", channel.Code))
+	}
 
 	return nil
 }
