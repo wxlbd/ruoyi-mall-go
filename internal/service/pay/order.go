@@ -7,8 +7,10 @@ import (
 	"backend-go/internal/pkg/core"
 	"backend-go/internal/repo/query"
 	"backend-go/internal/service/pay/client"
+	"backend-go/pkg/config"
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -88,14 +90,15 @@ func (s *PayOrderService) CreateOrder(ctx context.Context, reqDTO *req.PayOrderC
 		return existOrder.ID, nil
 	}
 
+	// 创建支付交易单 (对齐 Java: 使用 app.OrderNotifyURL)
 	order := &pay.PayOrder{
 		AppID:           app.ID,
 		MerchantOrderId: reqDTO.MerchantOrderId,
 		Subject:         reqDTO.Subject,
 		Body:            reqDTO.Body,
-		NotifyURL:       reqDTO.NotifyUrl,
+		NotifyURL:       app.OrderNotifyURL, // 对齐 Java: 使用 app 的回调地址
 		Price:           reqDTO.Price,
-		ExpireTime:      time.Now().Add(2 * time.Hour), // Parse from reqDTO if string
+		ExpireTime:      time.Now().Add(2 * time.Hour),
 		Status:          PayOrderStatusWaiting,
 		RefundPrice:     0,
 		UserIP:          reqDTO.UserIP,
@@ -148,17 +151,17 @@ func (s *PayOrderService) SubmitOrder(ctx context.Context, reqVO *req.PayOrderSu
 		}
 	}
 
-	// Call UnifiedOrder
+	// Call UnifiedOrder (对齐 Java: 使用渠道特定的回调 URL)
 	unifiedReq := &client.UnifiedOrderReq{
 		UserIP:     userIP,
 		OutTradeNo: no,
 		Subject:    order.Subject,
 		Body:       order.Body,
-		NotifyURL:  order.NotifyURL,
-		// ReturnURL:   reqVO.ReturnUrl, // If exists in reqVO
+		NotifyURL:  s.genChannelOrderNotifyUrl(channel), // 对齐 Java: 渠道回调 URL
+		// ReturnURL:   reqVO.ReturnUrl,
 		Price:       order.Price,
 		ExpireTime:  order.ExpireTime,
-		DisplayMode: reqVO.DisplayMode, // Assuming reqVO has this or we infer
+		DisplayMode: reqVO.DisplayMode,
 	}
 	unifiedResp, err := payClient.UnifiedOrder(ctx, unifiedReq)
 	if err != nil {
@@ -193,6 +196,12 @@ func (s *PayOrderService) validateOrderCanSubmit(ctx context.Context, id int64) 
 func (s *PayOrderService) validateChannelCanSubmit(ctx context.Context, appId int64, channelCode string) (*pay.PayChannel, error) {
 	// app validation is implicit or done separately
 	return s.channelSvc.GetChannelByAppIdAndCode(ctx, appId, channelCode)
+}
+
+// genChannelOrderNotifyUrl 根据支付渠道生成回调地址
+// 对齐 Java: payProperties.getOrderNotifyUrl() + "/" + channel.getId()
+func (s *PayOrderService) genChannelOrderNotifyUrl(channel *pay.PayChannel) string {
+	return fmt.Sprintf("%s/%d", config.C.Pay.OrderNotifyURL, channel.ID)
 }
 
 func (s *PayOrderService) generateNo() string {
