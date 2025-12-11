@@ -23,6 +23,7 @@ type TradeOrderUpdateService struct {
 	priceSvc   *TradePriceService
 	addressSvc *member.MemberAddressService
 	couponSvc  *promotion.CouponUserService
+	logSvc     *TradeOrderLogService
 }
 
 func NewTradeOrderUpdateService(
@@ -31,6 +32,7 @@ func NewTradeOrderUpdateService(
 	priceSvc *TradePriceService,
 	addressSvc *member.MemberAddressService,
 	couponSvc *promotion.CouponUserService,
+	logSvc *TradeOrderLogService,
 ) *TradeOrderUpdateService {
 	return &TradeOrderUpdateService{
 		q:          query.Q,
@@ -39,6 +41,7 @@ func NewTradeOrderUpdateService(
 		priceSvc:   priceSvc,
 		addressSvc: addressSvc,
 		couponSvc:  couponSvc,
+		logSvc:     logSvc,
 	}
 }
 
