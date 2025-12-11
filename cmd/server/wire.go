@@ -59,6 +59,7 @@ func InitApp() (*gin.Engine, error) {
 		service.NewPostService,
 		service.NewNoticeService,
 		service.NewConfigService,
+		service.NewSmsClientFactory,            // Added SmsClientFactory
 		service.NewSmsChannelService,           // Added SmsChannelService
 		service.NewSmsTemplateService,          // Added SmsTemplateService
 		service.NewSmsLogService,               // Added SmsLogService

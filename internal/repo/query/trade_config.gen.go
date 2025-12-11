@@ -29,12 +29,18 @@ func newTradeConfig(db *gorm.DB, opts ...gen.DOOption) tradeConfig {
 	tableName := _tradeConfig.tradeConfigDo.TableName()
 	_tradeConfig.ALL = field.NewAsterisk(tableName)
 	_tradeConfig.ID = field.NewInt64(tableName, "id")
+	_tradeConfig.AppID = field.NewInt64(tableName, "app_id")
 	_tradeConfig.AfterSaleDeadlineDays = field.NewInt(tableName, "after_sale_deadline_days")
 	_tradeConfig.PayTimeoutMinutes = field.NewInt(tableName, "pay_timeout_minutes")
 	_tradeConfig.AutoReceiveDays = field.NewInt(tableName, "auto_receive_days")
 	_tradeConfig.AutoCommentDays = field.NewInt(tableName, "auto_comment_days")
 	_tradeConfig.BrokerageWithdrawMinPrice = field.NewInt(tableName, "brokerage_withdraw_min_price")
 	_tradeConfig.BrokerageWithdrawFeePercent = field.NewInt(tableName, "brokerage_withdraw_fee_percent")
+	_tradeConfig.BrokerageEnabled = field.NewField(tableName, "brokerage_enabled")
+	_tradeConfig.BrokerageFrozenDays = field.NewInt(tableName, "brokerage_frozen_days")
+	_tradeConfig.BrokerageFirstPercent = field.NewInt(tableName, "brokerage_first_percent")
+	_tradeConfig.BrokerageSecondPercent = field.NewInt(tableName, "brokerage_second_percent")
+	_tradeConfig.BrokeragePosterUrls = field.NewString(tableName, "brokerage_poster_urls")
 	_tradeConfig.Creator = field.NewString(tableName, "creator")
 	_tradeConfig.CreateTime = field.NewTime(tableName, "create_time")
 	_tradeConfig.Updater = field.NewString(tableName, "updater")
@@ -52,12 +58,18 @@ type tradeConfig struct {
 
 	ALL                         field.Asterisk
 	ID                          field.Int64  // 主键
+	AppID                       field.Int64  // 支付应用ID
 	AfterSaleDeadlineDays       field.Int    // 售后期限(天)
 	PayTimeoutMinutes           field.Int    // 支付超时(分钟)
 	AutoReceiveDays             field.Int    // 自动收货(天)
 	AutoCommentDays             field.Int    // 自动好评(天)
 	BrokerageWithdrawMinPrice   field.Int    // 提现最低金额
 	BrokerageWithdrawFeePercent field.Int    // 提现手续费百分比
+	BrokerageEnabled            field.Field  // 是否开启分销
+	BrokerageFrozenDays         field.Int    // 分销佣金冻结时间
+	BrokerageFirstPercent       field.Int    // 一级分销比例
+	BrokerageSecondPercent      field.Int    // 二级分销比例
+	BrokeragePosterUrls         field.String // 分销海报图
 	Creator                     field.String // 创建者
 	CreateTime                  field.Time   // 创建时间
 	Updater                     field.String // 更新者
@@ -81,12 +93,18 @@ func (t tradeConfig) As(alias string) *tradeConfig {
 func (t *tradeConfig) updateTableName(table string) *tradeConfig {
 	t.ALL = field.NewAsterisk(table)
 	t.ID = field.NewInt64(table, "id")
+	t.AppID = field.NewInt64(table, "app_id")
 	t.AfterSaleDeadlineDays = field.NewInt(table, "after_sale_deadline_days")
 	t.PayTimeoutMinutes = field.NewInt(table, "pay_timeout_minutes")
 	t.AutoReceiveDays = field.NewInt(table, "auto_receive_days")
 	t.AutoCommentDays = field.NewInt(table, "auto_comment_days")
 	t.BrokerageWithdrawMinPrice = field.NewInt(table, "brokerage_withdraw_min_price")
 	t.BrokerageWithdrawFeePercent = field.NewInt(table, "brokerage_withdraw_fee_percent")
+	t.BrokerageEnabled = field.NewField(table, "brokerage_enabled")
+	t.BrokerageFrozenDays = field.NewInt(table, "brokerage_frozen_days")
+	t.BrokerageFirstPercent = field.NewInt(table, "brokerage_first_percent")
+	t.BrokerageSecondPercent = field.NewInt(table, "brokerage_second_percent")
+	t.BrokeragePosterUrls = field.NewString(table, "brokerage_poster_urls")
 	t.Creator = field.NewString(table, "creator")
 	t.CreateTime = field.NewTime(table, "create_time")
 	t.Updater = field.NewString(table, "updater")
@@ -119,14 +137,20 @@ func (t *tradeConfig) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (t *tradeConfig) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 13)
+	t.fieldMap = make(map[string]field.Expr, 19)
 	t.fieldMap["id"] = t.ID
+	t.fieldMap["app_id"] = t.AppID
 	t.fieldMap["after_sale_deadline_days"] = t.AfterSaleDeadlineDays
 	t.fieldMap["pay_timeout_minutes"] = t.PayTimeoutMinutes
 	t.fieldMap["auto_receive_days"] = t.AutoReceiveDays
 	t.fieldMap["auto_comment_days"] = t.AutoCommentDays
 	t.fieldMap["brokerage_withdraw_min_price"] = t.BrokerageWithdrawMinPrice
 	t.fieldMap["brokerage_withdraw_fee_percent"] = t.BrokerageWithdrawFeePercent
+	t.fieldMap["brokerage_enabled"] = t.BrokerageEnabled
+	t.fieldMap["brokerage_frozen_days"] = t.BrokerageFrozenDays
+	t.fieldMap["brokerage_first_percent"] = t.BrokerageFirstPercent
+	t.fieldMap["brokerage_second_percent"] = t.BrokerageSecondPercent
+	t.fieldMap["brokerage_poster_urls"] = t.BrokeragePosterUrls
 	t.fieldMap["creator"] = t.Creator
 	t.fieldMap["create_time"] = t.CreateTime
 	t.fieldMap["updater"] = t.Updater

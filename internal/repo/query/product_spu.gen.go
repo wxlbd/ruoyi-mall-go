@@ -55,8 +55,8 @@ func newProductSpu(db *gorm.DB, opts ...gen.DOOption) productSpu {
 	_productSpu.Updater = field.NewString(tableName, "updater")
 	_productSpu.CreatedAt = field.NewTime(tableName, "create_time")
 	_productSpu.UpdatedAt = field.NewTime(tableName, "update_time")
-	_productSpu.DeletedAt = field.NewField(tableName, "deleted_time")
 	_productSpu.Deleted = field.NewField(tableName, "deleted")
+	_productSpu.TenantID = field.NewInt64(tableName, "tenant_id")
 
 	_productSpu.fillFieldMap()
 
@@ -94,8 +94,8 @@ type productSpu struct {
 	Updater            field.String // 更新者
 	CreatedAt          field.Time   // 创建时间
 	UpdatedAt          field.Time   // 更新时间
-	DeletedAt          field.Field  // 删除时间
 	Deleted            field.Field  // 是否删除
+	TenantID           field.Int64  // 租户编号
 
 	fieldMap map[string]field.Expr
 }
@@ -139,8 +139,8 @@ func (p *productSpu) updateTableName(table string) *productSpu {
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
+	p.TenantID = field.NewInt64(table, "tenant_id")
 
 	p.fillFieldMap()
 
@@ -195,8 +195,8 @@ func (p *productSpu) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
+	p.fieldMap["tenant_id"] = p.TenantID
 }
 
 func (p productSpu) clone(db *gorm.DB) productSpu {
