@@ -231,7 +231,10 @@ type TradeOrderLogResp struct {
 
 type TradeOrderPageItemResp struct {
 	TradeOrderBase
-	Items []TradeOrderItemBase `json:"items"`
+	Items            []TradeOrderItemBase `json:"items"`
+	User             *MemberUserResp      `json:"user"`
+	BrokerageUser    *MemberUserResp      `json:"brokerageUser"`
+	ReceiverAreaName string               `json:"receiverAreaName"`
 }
 
 type TradeOrderSummaryResp struct {
