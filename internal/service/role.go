@@ -231,3 +231,27 @@ func (s *RoleService) convertResp(item *model.SystemRole) *resp.RoleRespVO {
 		CreateTime:       item.CreatedAt,
 	}
 }
+
+// SuperAdminRoleCode 超级管理员角色编码
+const SuperAdminRoleCode = "super_admin"
+
+// HasAnySuperAdmin 判断角色列表中是否包含超级管理员角色
+// 对应 Java: RoleServiceImpl.hasAnySuperAdmin
+func (s *RoleService) HasAnySuperAdmin(ctx context.Context, roleIds []int64) (bool, error) {
+	if len(roleIds) == 0 {
+		return false, nil
+	}
+
+	r := s.q.SystemRole
+	roles, err := r.WithContext(ctx).Where(r.ID.In(roleIds...)).Find()
+	if err != nil {
+		return false, err
+	}
+
+	for _, role := range roles {
+		if role.Code == SuperAdminRoleCode {
+			return true, nil
+		}
+	}
+	return false, nil
+}

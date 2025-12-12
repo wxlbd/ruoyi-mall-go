@@ -138,14 +138,16 @@ func (s *AuthService) GetPermissionInfo(ctx context.Context) (*resp.AuthPermissi
 	}
 	// 过滤禁用的角色 (Java: roles.removeIf(role -> !CommonStatusEnum.ENABLE.getStatus().equals(role.getStatus())))
 	var roles []string
+	var enabledRoleIds []int64 // 仅保留启用的角色ID
 	for _, r := range rolesData {
 		if r.Status == 0 { // 0 = ENABLE
 			roles = append(roles, r.Code)
+			enabledRoleIds = append(enabledRoleIds, r.ID)
 		}
 	}
 
-	// 4. 获取角色菜单
-	menuIds, err := s.permSvc.GetRoleMenuListByRoleId(ctx, roleIds)
+	// 4. 获取角色菜单 (使用启用的角色ID，而非全部角色ID)
+	menuIds, err := s.permSvc.GetRoleMenuListByRoleId(ctx, enabledRoleIds)
 	if err != nil {
 		return nil, err
 	}

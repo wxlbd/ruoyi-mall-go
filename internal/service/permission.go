@@ -34,10 +34,24 @@ func (s *PermissionService) GetUserRoleIdListByUserId(ctx context.Context, userI
 }
 
 // GetRoleMenuListByRoleId 获取角色的菜单ID列表
+// 对应 Java: PermissionServiceImpl.getRoleMenuListByRoleId
 func (s *PermissionService) GetRoleMenuListByRoleId(ctx context.Context, roleIds []int64) ([]int64, error) {
 	if len(roleIds) == 0 {
 		return []int64{}, nil
 	}
+
+	// 如果是管理员的情况下，获取全部菜单编号
+	// 对应 Java: if (roleService.hasAnySuperAdmin(roleIds)) { return convertSet(menuService.getMenuList(), MenuDO::getId); }
+	isSuperAdmin, err := s.roleSvc.HasAnySuperAdmin(ctx, roleIds)
+	if err != nil {
+		return nil, err
+	}
+	if isSuperAdmin {
+		// 超级管理员返回所有菜单
+		return s.getAllMenuIds(ctx)
+	}
+
+	// 如果是非管理员的情况下，获得拥有的菜单编号
 	rm := s.q.SystemRoleMenu
 	list, err := rm.WithContext(ctx).Where(rm.RoleID.In(roleIds...)).Find()
 	if err != nil {
@@ -47,6 +61,18 @@ func (s *PermissionService) GetRoleMenuListByRoleId(ctx context.Context, roleIds
 	return lo.Uniq(lo.Map(list, func(item *model.SystemRoleMenu, _ int) int64 {
 		return item.MenuID
 	})), nil
+}
+
+// getAllMenuIds 获取所有菜单ID (用于超级管理员)
+func (s *PermissionService) getAllMenuIds(ctx context.Context) ([]int64, error) {
+	m := s.q.SystemMenu
+	menus, err := m.WithContext(ctx).Find()
+	if err != nil {
+		return nil, err
+	}
+	return lo.Map(menus, func(item *model.SystemMenu, _ int) int64 {
+		return item.ID
+	}), nil
 }
 
 // AssignRoleMenu 赋予角色菜单
