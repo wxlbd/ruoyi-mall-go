@@ -118,6 +118,10 @@ func InitRouter(db *gorm.DB, rdb *redis.Client,
 	appKefuHandler *promotionApp.AppKefuHandler,
 	// Point Activity
 	pointActivityHandler *promotionAdmin.PointActivityHandler,
+	// Record Handlers (Added Phase 3)
+	bargainRecordHandler *promotionAdmin.BargainRecordHandler,
+	combinationRecordHandler *promotionAdmin.CombinationRecordHandler,
+	bargainHelpHandler *promotionAdmin.BargainHelpHandler,
 	// Trade Config
 	tradeConfigHandler *tradeAdmin.TradeConfigHandler,
 	appTradeConfigHandler *tradeApp.AppTradeConfigHandler,
@@ -176,6 +180,7 @@ func InitRouter(db *gorm.DB, rdb *redis.Client,
 		articleCategoryHandler, articleHandler,
 		diyTemplateHandler, diyPageHandler, kefuHandler,
 		pointActivityHandler,
+		bargainRecordHandler, combinationRecordHandler, bargainHelpHandler,
 	)
 
 	// Trade 模块

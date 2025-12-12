@@ -77,3 +77,27 @@ type AppCombinationRecordSummaryRespVO struct {
 	UserCount int64    `json:"userCount"`
 	Avatars   []string `json:"avatars"`
 }
+
+// CombinationRecordPageItemRespVO 拼团记录 Admin 分页 VO
+type CombinationRecordPageItemRespVO struct {
+	ID               int64     `json:"id"`
+	ActivityID       int64     `json:"activityId"`
+	ActivityName     string    `json:"activityName"`
+	SpuID            int64     `json:"spuId"`
+	SpuName          string    `json:"spuName"`
+	PicUrl           string    `json:"picUrl"`
+	UserID           int64     `json:"userId"`
+	Nickname         string    `json:"nickname"`
+	Avatar           string    `json:"avatar"`
+	UserCount        int       `json:"userCount"`
+	UserSize         int       `json:"userSize"`
+	Status           int       `json:"status"`
+	CombinationPrice int       `json:"combinationPrice"`
+	HeadID           int64     `json:"headId"`
+	OrderID          int64     `json:"orderId"`
+	VirtualGroup     bool      `json:"virtualGroup"`
+	ExpireTime       time.Time `json:"expireTime"`
+	StartTime        time.Time `json:"startTime"`
+	EndTime          time.Time `json:"endTime"`
+	CreateTime       time.Time `json:"createTime"`
+}

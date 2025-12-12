@@ -23,6 +23,7 @@ type CombinationRecordService interface {
 	// Internal (for Order)
 	ValidateCombinationRecord(ctx context.Context, userID int64, activityID int64, headID int64, skuID int64, count int) (*promotion.PromotionCombinationActivity, *promotion.PromotionCombinationProduct, error)
 	CreateCombinationRecord(ctx context.Context, record *promotion.PromotionCombinationRecord) (int64, error)
+	GetCombinationRecordPageAdmin(ctx context.Context, req *req.CombinationRecordPageReq) (*core.PageResult[*promotion.PromotionCombinationRecord], error)
 }
 
 type combinationRecordService struct {
@@ -232,4 +233,23 @@ func (s *combinationRecordService) updateCombinationRecordWhenCreate(ctx context
 	}
 	// TODO: Send Success Notification if isFull
 	return nil
+}
+
+// GetCombinationRecordPageAdmin 获得拼团记录分页 (Admin)
+func (s *combinationRecordService) GetCombinationRecordPageAdmin(ctx context.Context, req *req.CombinationRecordPageReq) (*core.PageResult[*promotion.PromotionCombinationRecord], error) {
+	q := s.q.PromotionCombinationRecord
+	do := q.WithContext(ctx)
+
+	if req.Status != nil {
+		do = do.Where(q.Status.Eq(*req.Status))
+	}
+	if len(req.DateRange) == 2 {
+		do = do.Where(q.CreatedAt.Between(req.DateRange[0], req.DateRange[1]))
+	}
+
+	list, total, err := do.Order(q.CreatedAt.Desc()).FindByPage(int((req.PageNo-1)*req.PageSize), int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+	return &core.PageResult[*promotion.PromotionCombinationRecord]{List: list, Total: total}, nil
 }

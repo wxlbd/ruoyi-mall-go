@@ -50,3 +50,11 @@ type AppCombinationRecordPageReq struct {
 	core.PageParam
 	Status int `json:"status"` // 0-进行中 1-成功 2-失败
 }
+
+// CombinationRecordPageReq 拼团记录分页 Request VO (Admin)
+type CombinationRecordPageReq struct {
+	core.PageParam
+	Status    *int        `json:"status" form:"status"`
+	Name      string      `json:"name" form:"name"` // User Nickname?
+	DateRange []time.Time `json:"dateRange" form:"dateRange" time_format:"2006-01-02 15:04:05"`
+}

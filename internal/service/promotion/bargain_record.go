@@ -91,3 +91,22 @@ func (s *BargainRecordService) GetBargainRecordPage(ctx context.Context, userID 
 	}
 	return &core.PageResult[*promotion.PromotionBargainRecord]{List: list, Total: total}, nil
 }
+
+// GetBargainRecordPageAdmin 获得砍价记录分页 (Admin)
+func (s *BargainRecordService) GetBargainRecordPageAdmin(ctx context.Context, req *req.BargainRecordPageReq) (*core.PageResult[*promotion.PromotionBargainRecord], error) {
+	q := s.q.PromotionBargainRecord
+	do := q.WithContext(ctx)
+
+	if req.Status != nil {
+		do = do.Where(q.Status.Eq(*req.Status))
+	}
+	if len(req.DateRange) == 2 {
+		do = do.Where(q.CreatedAt.Between(req.DateRange[0], req.DateRange[1]))
+	}
+
+	list, total, err := do.Order(q.CreatedAt.Desc()).FindByPage(int((req.PageNo-1)*req.PageSize), int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+	return &core.PageResult[*promotion.PromotionBargainRecord]{List: list, Total: total}, nil
+}

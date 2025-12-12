@@ -196,6 +196,19 @@ func (s *BargainActivityService) GetBargainActivityList(ctx context.Context, ids
 	return q.WithContext(ctx).Where(q.ID.In(ids...)).Find()
 }
 
+// GetBargainActivityMap 获得砍价活动 Map
+func (s *BargainActivityService) GetBargainActivityMap(ctx context.Context, ids []int64) (map[int64]*promotion.PromotionBargainActivity, error) {
+	list, err := s.GetBargainActivityList(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[int64]*promotion.PromotionBargainActivity, len(list))
+	for _, item := range list {
+		result[item.ID] = item
+	}
+	return result, nil
+}
+
 // validateBargainConflict 校验商品冲突
 func (s *BargainActivityService) validateBargainConflict(ctx context.Context, spuID int64, activityID int64) error {
 	q := s.q.PromotionBargainActivity

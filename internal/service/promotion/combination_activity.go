@@ -19,6 +19,7 @@ type CombinationActivityService interface {
 	DeleteCombinationActivity(ctx context.Context, id int64) error
 	GetCombinationActivity(ctx context.Context, id int64) (*resp.CombinationActivityRespVO, error)
 	GetCombinationActivityPage(ctx context.Context, req req.CombinationActivityPageReq) (*core.PageResult[*resp.CombinationActivityRespVO], error)
+	GetCombinationActivityMap(ctx context.Context, ids []int64) (map[int64]*promotion.PromotionCombinationActivity, error)
 
 	// App
 	GetCombinationActivityList(ctx context.Context, count int) ([]*resp.AppCombinationActivityRespVO, error)
@@ -257,6 +258,21 @@ func (s *combinationActivityService) GetCombinationActivityPage(ctx context.Cont
 		List:  result,
 		Total: total,
 	}, nil
+}
+
+func (s *combinationActivityService) GetCombinationActivityMap(ctx context.Context, ids []int64) (map[int64]*promotion.PromotionCombinationActivity, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	list, err := s.q.PromotionCombinationActivity.WithContext(ctx).Where(s.q.PromotionCombinationActivity.ID.In(ids...)).Find()
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[int64]*promotion.PromotionCombinationActivity, len(list))
+	for _, item := range list {
+		result[item.ID] = item
+	}
+	return result, nil
 }
 
 func (s *combinationActivityService) GetCombinationActivityList(ctx context.Context, count int) ([]*resp.AppCombinationActivityRespVO, error) {

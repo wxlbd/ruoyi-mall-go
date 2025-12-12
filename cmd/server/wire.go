@@ -245,7 +245,9 @@ func InitApp() (*gin.Engine, error) {
 		promotionAdmin.NewDiyTemplateHandler,         // Added Diy Template
 		promotionAdmin.NewDiyPageHandler,             // Added Diy Page
                 promotionAdmin.NewPointActivityHandler,		promotionAdmin.NewKefuHandler,
-		promotionApp.NewAppKefuHandler,
+                promotionAdmin.NewBargainRecordHandler,
+                promotionAdmin.NewCombinationRecordHandler,
+                promotionAdmin.NewBargainHelpHandler,		promotionApp.NewAppKefuHandler,
 		promotionApp.NewAppCouponHandler,
 		promotionApp.NewAppBannerHandler, // Added Banner
 		promotionApp.NewAppBargainActivityHandler,

@@ -23,6 +23,9 @@ func RegisterPromotionRoutes(engine *gin.Engine,
 	diyPageHandler *promotionAdmin.DiyPageHandler,
 	kefuHandler *promotionAdmin.KefuHandler,
 	pointActivityHandler *promotionAdmin.PointActivityHandler,
+	bargainRecordHandler *promotionAdmin.BargainRecordHandler,
+	combinationRecordHandler *promotionAdmin.CombinationRecordHandler,
+	bargainHelpHandler *promotionAdmin.BargainHelpHandler,
 ) {
 	promotionGroup := engine.Group("/admin-api/promotion")
 	promotionGroup.Use(middleware.Auth())
@@ -190,6 +193,24 @@ func RegisterPromotionRoutes(engine *gin.Engine,
 			pointActivityGroup.GET("/get", pointActivityHandler.GetPointActivity)
 			pointActivityGroup.GET("/page", pointActivityHandler.GetPointActivityPage)
 			pointActivityGroup.GET("/list-by-ids", pointActivityHandler.GetPointActivityListByIds)
+		}
+
+		// Bargain Record
+		bargainRecordGroup := promotionGroup.Group("/bargain-record")
+		{
+			bargainRecordGroup.GET("/page", bargainRecordHandler.GetBargainRecordPage)
+		}
+
+		// Combination Record
+		combinationRecordGroup := promotionGroup.Group("/combination-record")
+		{
+			combinationRecordGroup.GET("/page", combinationRecordHandler.GetCombinationRecordPage)
+		}
+
+		// Bargain Help
+		bargainHelpGroup := promotionGroup.Group("/bargain-help")
+		{
+			bargainHelpGroup.GET("/page", bargainHelpHandler.GetBargainHelpPage)
 		}
 	}
 }
