@@ -22,6 +22,7 @@ func RegisterPromotionRoutes(engine *gin.Engine,
 	diyTemplateHandler *promotionAdmin.DiyTemplateHandler,
 	diyPageHandler *promotionAdmin.DiyPageHandler,
 	kefuHandler *promotionAdmin.KefuHandler,
+	pointActivityHandler *promotionAdmin.PointActivityHandler,
 ) {
 	promotionGroup := engine.Group("/admin-api/promotion")
 	promotionGroup.Use(middleware.Auth())
@@ -31,13 +32,19 @@ func RegisterPromotionRoutes(engine *gin.Engine,
 		{
 			templateGroup.POST("/create", couponHandler.CreateCouponTemplate)
 			templateGroup.PUT("/update", couponHandler.UpdateCouponTemplate)
+			templateGroup.PUT("/update-status", couponHandler.UpdateCouponTemplateStatus)
+			templateGroup.DELETE("/delete", couponHandler.DeleteCouponTemplate)
+			templateGroup.GET("/get", couponHandler.GetCouponTemplate)
 			templateGroup.GET("/page", couponHandler.GetCouponTemplatePage)
+			templateGroup.GET("/list", couponHandler.GetCouponTemplateList)
 		}
 
 		// Coupon
 		couponGroup := promotionGroup.Group("/coupon")
 		{
+			couponGroup.DELETE("/delete", couponHandler.DeleteCoupon)
 			couponGroup.GET("/page", couponHandler.GetCouponPage)
+			couponGroup.POST("/send", couponHandler.SendCoupon)
 		}
 
 		// Banner
@@ -171,6 +178,18 @@ func RegisterPromotionRoutes(engine *gin.Engine,
 		{
 			kefuMessageGroup.POST("/send", kefuHandler.SendMessage)
 			kefuMessageGroup.GET("/page", kefuHandler.GetMessagePage)
+		}
+
+		// Point Activity
+		pointActivityGroup := promotionGroup.Group("/point-activity")
+		{
+			pointActivityGroup.POST("/create", pointActivityHandler.CreatePointActivity)
+			pointActivityGroup.PUT("/update", pointActivityHandler.UpdatePointActivity)
+			pointActivityGroup.PUT("/close", pointActivityHandler.ClosePointActivity)
+			pointActivityGroup.DELETE("/delete", pointActivityHandler.DeletePointActivity)
+			pointActivityGroup.GET("/get", pointActivityHandler.GetPointActivity)
+			pointActivityGroup.GET("/page", pointActivityHandler.GetPointActivityPage)
+			pointActivityGroup.GET("/list-by-ids", pointActivityHandler.GetPointActivityListByIds)
 		}
 	}
 }

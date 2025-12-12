@@ -60,3 +60,17 @@ type CouponPageReq struct {
 	UserID   *int64 `form:"userId"`
 	Status   *int   `form:"status"`
 }
+
+// CouponTemplateUpdateStatusReq 更新优惠券模板状态 Request
+// 对应 Java: CouponTemplateUpdateStatusReqVO
+type CouponTemplateUpdateStatusReq struct {
+	ID     int64 `json:"id"`
+	Status int32 `json:"status"`
+}
+
+// CouponSendReq 发送优惠券 Request
+// 对应 Java: CouponSendReqVO
+type CouponSendReq struct {
+	TemplateID int64   `json:"templateId"`
+	UserIDs    []int64 `json:"userIds"`
+}

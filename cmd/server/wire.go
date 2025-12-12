@@ -231,7 +231,7 @@ func InitApp() (*gin.Engine, error) {
 		promotionSvc.NewArticleService,             // Added Article
 		promotionSvc.NewDiyTemplateService,         // Added Diy Template
 		promotionSvc.NewDiyPageService,             // Added Diy Page
-		promotionSvc.NewKefuService,
+                promotionSvc.NewPointActivityService,		promotionSvc.NewKefuService,
 		promotionAdmin.NewCouponHandler,
 		promotionAdmin.NewBannerHandler,              // Added Banner
 		promotionAdmin.NewRewardActivityHandler,      // Added Activity
@@ -244,7 +244,7 @@ func InitApp() (*gin.Engine, error) {
 		promotionAdmin.NewArticleHandler,             // Added Article
 		promotionAdmin.NewDiyTemplateHandler,         // Added Diy Template
 		promotionAdmin.NewDiyPageHandler,             // Added Diy Page
-		promotionAdmin.NewKefuHandler,
+                promotionAdmin.NewPointActivityHandler,		promotionAdmin.NewKefuHandler,
 		promotionApp.NewAppKefuHandler,
 		promotionApp.NewAppCouponHandler,
 		promotionApp.NewAppBannerHandler, // Added Banner
