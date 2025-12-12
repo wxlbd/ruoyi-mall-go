@@ -3,6 +3,7 @@ package product
 import (
 	"backend-go/internal/api/req"
 	"backend-go/internal/api/resp"
+	"backend-go/internal/model"
 	"backend-go/internal/model/product"
 	"backend-go/internal/pkg/core"
 	"backend-go/internal/repo/query"
@@ -205,7 +206,7 @@ func (s *ProductCommentService) CreateAppComment(ctx context.Context, userId int
 
 	comment := &product.ProductComment{
 		UserID:            userId,
-		Anonymous:         req.Anonymous,
+		Anonymous:         model.NewBitBool(req.Anonymous),
 		OrderItemID:       req.OrderItemID,
 		OrderID:           item.OrderID,
 		SpuID:             item.SpuID,
@@ -272,7 +273,7 @@ func (s *ProductCommentService) convertList(list []*product.ProductComment) []*r
 			UserID:            item.UserID,
 			UserNickname:      item.UserNickname,
 			UserAvatar:        item.UserAvatar,
-			Anonymous:         item.Anonymous,
+			Anonymous:         bool(item.Anonymous),
 			OrderID:           item.OrderID,
 			OrderItemID:       item.OrderItemID,
 			SpuID:             item.SpuID,
@@ -280,13 +281,13 @@ func (s *ProductCommentService) convertList(list []*product.ProductComment) []*r
 			SkuID:             item.SkuID,
 			SkuPicURL:         item.SkuPicURL,
 			SkuProperties:     s.convertSkuProperties(item.SkuProperties),
-			Visible:           item.Visible,
+			Visible:           bool(item.Visible),
 			Scores:            item.Scores,
 			DescriptionScores: item.DescriptionScores,
 			BenefitScores:     item.BenefitScores,
 			Content:           item.Content,
 			PicURLs:           item.PicURLs,
-			ReplyStatus:       item.ReplyStatus,
+			ReplyStatus:       bool(item.ReplyStatus),
 			ReplyUserID:       item.ReplyUserID,
 			ReplyContent:      item.ReplyContent,
 			ReplyTime:         item.ReplyTime,
