@@ -54,7 +54,7 @@ type ProductSpuUpdateStatusReq struct {
 type ProductSpuPageReq struct {
 	PageNo     int      `form:"pageNo" binding:"required,min=1"`
 	PageSize   int      `form:"pageSize" binding:"required,min=1,max=100"`
-	TabType    int      `form:"tabType"` // 标签类型，见 ProductSpuPageReq.FOR_SALE 等常量
+	TabType    *int     `form:"tabType"` // 标签类型，见 ProductSpuPageReq.FOR_SALE 等常量
 	Name       string   `form:"name"`
 	CategoryID int64    `form:"categoryId"`
 	CreateTime []string `form:"createTime[]"`

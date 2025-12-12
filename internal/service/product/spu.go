@@ -3,6 +3,7 @@ package product
 import (
 	"backend-go/internal/api/req"
 	"backend-go/internal/api/resp"
+	"backend-go/internal/model"
 	"backend-go/internal/model/product"
 	"backend-go/internal/pkg/core"
 	"backend-go/internal/repo/query"
@@ -54,11 +55,11 @@ func (s *ProductSpuService) CreateSpu(ctx context.Context, req *req.ProductSpuSa
 		PicURL:             req.PicURL,
 		SliderPicURLs:      req.SliderPicURLs,
 		Sort:               req.Sort,
-		SpecType:           *req.SpecType,
+		SpecType:           model.BitBool(*req.SpecType),
 		DeliveryTypes:      req.DeliveryTypes,
 		DeliveryTemplateID: req.DeliveryTemplateID,
 		GiveIntegral:       req.GiveIntegral,
-		SubCommissionType:  *req.SubCommissionType,
+		SubCommissionType:  model.BitBool(*req.SubCommissionType),
 		VirtualSalesCount:  req.VirtualSalesCount,
 		Status:             0, // Default to 0? Or from req? Java defaults to ENABLE if not set, logic is in initSpuFromSkus
 	}
@@ -109,11 +110,11 @@ func (s *ProductSpuService) UpdateSpu(ctx context.Context, req *req.ProductSpuSa
 		PicURL:             req.PicURL,
 		SliderPicURLs:      req.SliderPicURLs,
 		Sort:               req.Sort,
-		SpecType:           *req.SpecType,
+		SpecType:           model.BitBool(*req.SpecType),
 		DeliveryTypes:      req.DeliveryTypes,
 		DeliveryTemplateID: req.DeliveryTemplateID,
 		GiveIntegral:       req.GiveIntegral,
-		SubCommissionType:  *req.SubCommissionType,
+		SubCommissionType:  model.BitBool(*req.SubCommissionType),
 		VirtualSalesCount:  req.VirtualSalesCount,
 		Status:             spu.Status, // Keep status
 	}
@@ -183,53 +184,24 @@ func (s *ProductSpuService) GetSpuPage(ctx context.Context, req *req.ProductSpuP
 	u := s.q.ProductSpu
 	q := u.WithContext(ctx)
 
-	if req.TabType != 0 {
-		// Implement Tab logic
-		// SpuTabForSale      = 0 // 出售中 (Status = 0)
-		// SpuTabInWarehouse  = 1 // 仓库中 (Status = 1)
-		// SpuTabSoldOut      = 2 // 已售空 (Stock = 0)
-		// SpuTabAlertStock   = 3 // 警戒库存 (TODO: Stock < limit)
-		// SpuTabRecycleBin   = 4 // 回收站 (Status = -1)
-
-		// Map frontend tab types (which might differ) to logic
-		// Assuming Request TabType aligns with Logic
-		// Actually typical logic:
-		// 1: For Sale -> status = 0
-		// 2: In Warehouse -> status = 1
-		// 3: Sold Out -> stock = 0
-		// 4: Alert -> ...
-		// 5: Recycle -> status = -1
-
-		// Let's assume standard mapping:
-		// req.TabType: 0=All? No, typical admin logic usually defaults to something.
-		// Let's implement based on names:
-
-		// NOTE: In Java `ProductSpuPageReqVO`, TabType is used.
-		// Values:
-		// 0: FOR_SALE (status=0)
-		// 1: IN_WAREHOUSE (status=1)
-		// 2: SOLD_OUT (stock=0)
-		// 3: ALERT_STOCK (stock <= alert_stock)
-		// 4: RECYCLE_BIN (status=-1)
-
-		switch req.TabType {
+	if req.TabType != nil {
+		switch *req.TabType {
 		case 0:
+			// 出售中 (Status = 0)
 			q = q.Where(u.Status.Eq(0))
 		case 1:
+			// 仓库中 (Status = 1)
 			q = q.Where(u.Status.Eq(1))
 		case 2:
+			// 已售空 (Stock = 0)
 			q = q.Where(u.Stock.Eq(0))
 		case 3:
-			// Alert stock logic needed. For now skip or assume stock < 10
-			q = q.Where(u.Stock.Lt(10))
+			// 警戒库存 (Stock <= 10)
+			q = q.Where(u.Stock.Lte(10))
 		case 4:
+			// 回收站 (Status = -1)
 			q = q.Where(u.Status.Eq(-1))
 		}
-	} else {
-		// If TabType not passed, maybe default? Or logic handled by Status Param if exists.
-		// Assuming TabType 0 is "For Sale" based on most admin panels, BUT if 0 is default int value, we need care.
-		// Let's rely on explicit Status param if TabType logic is ambiguous or not strictly 0-indexed.
-		// Actually, let's just implement Name/Category filters which apply to all tabs.
 	}
 
 	if req.Name != "" {
@@ -399,7 +371,7 @@ func (s *ProductSpuService) convertResp(spu *product.ProductSpu, skus []*product
 		SliderPicURLs:      spu.SliderPicURLs,
 		Sort:               spu.Sort,
 		Status:             spu.Status,
-		SpecType:           spu.SpecType,
+		SpecType:           bool(spu.SpecType),
 		Price:              spu.Price,
 		MarketPrice:        spu.MarketPrice,
 		CostPrice:          spu.CostPrice,
@@ -407,7 +379,7 @@ func (s *ProductSpuService) convertResp(spu *product.ProductSpu, skus []*product
 		DeliveryTypes:      spu.DeliveryTypes,
 		DeliveryTemplateID: spu.DeliveryTemplateID,
 		GiveIntegral:       spu.GiveIntegral,
-		SubCommissionType:  spu.SubCommissionType,
+		SubCommissionType:  bool(spu.SubCommissionType),
 		SalesCount:         spu.SalesCount,
 		VirtualSalesCount:  spu.VirtualSalesCount,
 		BrowseCount:        spu.BrowseCount,

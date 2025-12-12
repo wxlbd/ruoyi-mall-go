@@ -39,7 +39,7 @@ func newProductSpu(db *gorm.DB, opts ...gen.DOOption) productSpu {
 	_productSpu.SliderPicURLs = field.NewField(tableName, "slider_pic_urls")
 	_productSpu.Sort = field.NewInt(tableName, "sort")
 	_productSpu.Status = field.NewInt(tableName, "status")
-	_productSpu.SpecType = field.NewBool(tableName, "spec_type")
+	_productSpu.SpecType = field.NewField(tableName, "spec_type")
 	_productSpu.Price = field.NewInt(tableName, "price")
 	_productSpu.MarketPrice = field.NewInt(tableName, "market_price")
 	_productSpu.CostPrice = field.NewInt(tableName, "cost_price")
@@ -47,7 +47,7 @@ func newProductSpu(db *gorm.DB, opts ...gen.DOOption) productSpu {
 	_productSpu.DeliveryTypes = field.NewField(tableName, "delivery_types")
 	_productSpu.DeliveryTemplateID = field.NewInt64(tableName, "delivery_template_id")
 	_productSpu.GiveIntegral = field.NewInt(tableName, "give_integral")
-	_productSpu.SubCommissionType = field.NewBool(tableName, "sub_commission_type")
+	_productSpu.SubCommissionType = field.NewField(tableName, "sub_commission_type")
 	_productSpu.SalesCount = field.NewInt(tableName, "sales_count")
 	_productSpu.VirtualSalesCount = field.NewInt(tableName, "virtual_sales_count")
 	_productSpu.BrowseCount = field.NewInt(tableName, "browse_count")
@@ -78,7 +78,7 @@ type productSpu struct {
 	SliderPicURLs      field.Field  // 商品轮播图
 	Sort               field.Int    // 排序字段
 	Status             field.Int    // 商品状态
-	SpecType           field.Bool   // 规格类型
+	SpecType           field.Field  // 规格类型
 	Price              field.Int    // 商品价格
 	MarketPrice        field.Int    // 市场价
 	CostPrice          field.Int    // 成本价
@@ -86,7 +86,7 @@ type productSpu struct {
 	DeliveryTypes      field.Field  // 配送方式数组
 	DeliveryTemplateID field.Int64  // 物流配置模板编号
 	GiveIntegral       field.Int    // 赠送积分
-	SubCommissionType  field.Bool   // 分销类型
+	SubCommissionType  field.Field  // 分销类型
 	SalesCount         field.Int    // 商品销量
 	VirtualSalesCount  field.Int    // 虚拟销量
 	BrowseCount        field.Int    // 浏览量
@@ -123,7 +123,7 @@ func (p *productSpu) updateTableName(table string) *productSpu {
 	p.SliderPicURLs = field.NewField(table, "slider_pic_urls")
 	p.Sort = field.NewInt(table, "sort")
 	p.Status = field.NewInt(table, "status")
-	p.SpecType = field.NewBool(table, "spec_type")
+	p.SpecType = field.NewField(table, "spec_type")
 	p.Price = field.NewInt(table, "price")
 	p.MarketPrice = field.NewInt(table, "market_price")
 	p.CostPrice = field.NewInt(table, "cost_price")
@@ -131,7 +131,7 @@ func (p *productSpu) updateTableName(table string) *productSpu {
 	p.DeliveryTypes = field.NewField(table, "delivery_types")
 	p.DeliveryTemplateID = field.NewInt64(table, "delivery_template_id")
 	p.GiveIntegral = field.NewInt(table, "give_integral")
-	p.SubCommissionType = field.NewBool(table, "sub_commission_type")
+	p.SubCommissionType = field.NewField(table, "sub_commission_type")
 	p.SalesCount = field.NewInt(table, "sales_count")
 	p.VirtualSalesCount = field.NewInt(table, "virtual_sales_count")
 	p.BrowseCount = field.NewInt(table, "browse_count")

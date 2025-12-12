@@ -34,6 +34,7 @@ func newProductCategory(db *gorm.DB, opts ...gen.DOOption) productCategory {
 	_productCategory.PicURL = field.NewString(tableName, "pic_url")
 	_productCategory.Sort = field.NewInt32(tableName, "sort")
 	_productCategory.Status = field.NewInt32(tableName, "status")
+	_productCategory.Description = field.NewString(tableName, "description")
 	_productCategory.Creator = field.NewString(tableName, "creator")
 	_productCategory.Updater = field.NewString(tableName, "updater")
 	_productCategory.CreatedAt = field.NewTime(tableName, "create_time")
@@ -49,19 +50,20 @@ func newProductCategory(db *gorm.DB, opts ...gen.DOOption) productCategory {
 type productCategory struct {
 	productCategoryDo productCategoryDo
 
-	ALL       field.Asterisk
-	ID        field.Int64  // 分类编号
-	ParentID  field.Int64  // 父分类编号
-	Name      field.String // 分类名称
-	PicURL    field.String // 移动端分类图
-	Sort      field.Int32  // 分类排序
-	Status    field.Int32  // 开启状态
-	Creator   field.String // 创建者
-	Updater   field.String // 更新者
-	CreatedAt field.Time   // 创建时间
-	UpdatedAt field.Time   // 更新时间
-	DeletedAt field.Field  // 删除时间
-	Deleted   field.Field  // 是否删除
+	ALL         field.Asterisk
+	ID          field.Int64  // 分类编号
+	ParentID    field.Int64  // 父分类编号
+	Name        field.String // 分类名称
+	PicURL      field.String // 移动端分类图
+	Sort        field.Int32  // 分类排序
+	Status      field.Int32  // 开启状态
+	Description field.String // 分类描述
+	Creator     field.String // 创建者
+	Updater     field.String // 更新者
+	CreatedAt   field.Time   // 创建时间
+	UpdatedAt   field.Time   // 更新时间
+	DeletedAt   field.Field  // 删除时间
+	Deleted     field.Field  // 是否删除
 
 	fieldMap map[string]field.Expr
 }
@@ -84,6 +86,7 @@ func (p *productCategory) updateTableName(table string) *productCategory {
 	p.PicURL = field.NewString(table, "pic_url")
 	p.Sort = field.NewInt32(table, "sort")
 	p.Status = field.NewInt32(table, "status")
+	p.Description = field.NewString(table, "description")
 	p.Creator = field.NewString(table, "creator")
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
@@ -118,13 +121,14 @@ func (p *productCategory) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (p *productCategory) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 12)
+	p.fieldMap = make(map[string]field.Expr, 13)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["parent_id"] = p.ParentID
 	p.fieldMap["name"] = p.Name
 	p.fieldMap["pic_url"] = p.PicURL
 	p.fieldMap["sort"] = p.Sort
 	p.fieldMap["status"] = p.Status
+	p.fieldMap["description"] = p.Description
 	p.fieldMap["creator"] = p.Creator
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt

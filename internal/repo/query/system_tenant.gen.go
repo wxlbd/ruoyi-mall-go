@@ -30,13 +30,13 @@ func newSystemTenant(db *gorm.DB, opts ...gen.DOOption) systemTenant {
 	_systemTenant.ALL = field.NewAsterisk(tableName)
 	_systemTenant.ID = field.NewInt64(tableName, "id")
 	_systemTenant.Name = field.NewString(tableName, "name")
-	_systemTenant.ContactUserId = field.NewInt64(tableName, "contact_user_id")
 	_systemTenant.ContactName = field.NewString(tableName, "contact_name")
 	_systemTenant.ContactMobile = field.NewString(tableName, "contact_mobile")
 	_systemTenant.Status = field.NewInt32(tableName, "status")
+	_systemTenant.Domain = field.NewString(tableName, "domain")
 	_systemTenant.Websites = field.NewString(tableName, "websites")
 	_systemTenant.PackageID = field.NewInt64(tableName, "package_id")
-	_systemTenant.ExpireTime = field.NewTime(tableName, "expire_time")
+	_systemTenant.ExpireDate = field.NewTime(tableName, "expire_time")
 	_systemTenant.AccountCount = field.NewInt32(tableName, "account_count")
 	_systemTenant.Creator = field.NewString(tableName, "creator")
 	_systemTenant.Updater = field.NewString(tableName, "updater")
@@ -55,13 +55,13 @@ type systemTenant struct {
 	ALL           field.Asterisk
 	ID            field.Int64
 	Name          field.String
-	ContactUserId field.Int64
 	ContactName   field.String
 	ContactMobile field.String
 	Status        field.Int32
+	Domain        field.String
 	Websites      field.String
 	PackageID     field.Int64
-	ExpireTime    field.Time
+	ExpireDate    field.Time
 	AccountCount  field.Int32
 	Creator       field.String
 	Updater       field.String
@@ -86,13 +86,13 @@ func (s *systemTenant) updateTableName(table string) *systemTenant {
 	s.ALL = field.NewAsterisk(table)
 	s.ID = field.NewInt64(table, "id")
 	s.Name = field.NewString(table, "name")
-	s.ContactUserId = field.NewInt64(table, "contact_user_id")
 	s.ContactName = field.NewString(table, "contact_name")
 	s.ContactMobile = field.NewString(table, "contact_mobile")
 	s.Status = field.NewInt32(table, "status")
+	s.Domain = field.NewString(table, "domain")
 	s.Websites = field.NewString(table, "websites")
 	s.PackageID = field.NewInt64(table, "package_id")
-	s.ExpireTime = field.NewTime(table, "expire_time")
+	s.ExpireDate = field.NewTime(table, "expire_time")
 	s.AccountCount = field.NewInt32(table, "account_count")
 	s.Creator = field.NewString(table, "creator")
 	s.Updater = field.NewString(table, "updater")
@@ -130,13 +130,13 @@ func (s *systemTenant) fillFieldMap() {
 	s.fieldMap = make(map[string]field.Expr, 15)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["name"] = s.Name
-	s.fieldMap["contact_user_id"] = s.ContactUserId
 	s.fieldMap["contact_name"] = s.ContactName
 	s.fieldMap["contact_mobile"] = s.ContactMobile
 	s.fieldMap["status"] = s.Status
+	s.fieldMap["domain"] = s.Domain
 	s.fieldMap["websites"] = s.Websites
 	s.fieldMap["package_id"] = s.PackageID
-	s.fieldMap["expire_time"] = s.ExpireTime
+	s.fieldMap["expire_time"] = s.ExpireDate
 	s.fieldMap["account_count"] = s.AccountCount
 	s.fieldMap["creator"] = s.Creator
 	s.fieldMap["updater"] = s.Updater

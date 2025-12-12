@@ -113,7 +113,7 @@ func (s *ProductCategoryService) GetCategoryList(ctx context.Context, req *req.P
 	if req.Status != nil {
 		q = q.Where(u.Status.Eq(*req.Status))
 	}
-	list, err := q.Order(u.Sort.Desc(), u.ID.Asc()).Find() // Sort desc, ID asc
+	list, err := q.Order(u.Sort.Asc(), u.ID.Asc()).Find() // Sort asc (Java parity)
 	if err != nil {
 		return nil, err
 	}
@@ -155,12 +155,13 @@ func (s *ProductCategoryService) ValidateCategory(ctx context.Context, id int64)
 
 func (s *ProductCategoryService) convertResp(item *product.ProductCategory) *resp.ProductCategoryResp {
 	return &resp.ProductCategoryResp{
-		ID:        item.ID,
-		ParentID:  item.ParentID,
-		Name:      item.Name,
-		PicURL:    item.PicURL,
-		Sort:      item.Sort,
-		Status:    item.Status,
-		CreatedAt: item.CreatedAt,
+		ID:          item.ID,
+		ParentID:    item.ParentID,
+		Name:        item.Name,
+		PicURL:      item.PicURL,
+		Sort:        item.Sort,
+		Status:      item.Status,
+		Description: item.Description,
+		CreatedAt:   item.CreatedAt,
 	}
 }
