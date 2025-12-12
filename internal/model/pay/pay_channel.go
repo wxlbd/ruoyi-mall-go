@@ -4,7 +4,6 @@ import (
 	"backend-go/internal/model"
 	"time"
 
-	"gorm.io/gorm"
 )
 
 // PayChannel 支付渠道 DO
@@ -21,7 +20,6 @@ type PayChannel struct {
 	Updater   string         `gorm:"size:64;default:'';comment:更新者" json:"updater"`
 	CreatedAt time.Time      `gorm:"column:create_time;autoCreateTime;comment:创建时间" json:"createTime"`
 	UpdatedAt time.Time      `gorm:"column:update_time;autoUpdateTime;comment:更新时间" json:"updateTime"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_time;index;comment:删除时间" json:"-"`
 	Deleted   model.BitBool  `gorm:"column:deleted;softDelete:flag;default:0;comment:是否删除" json:"deleted"`
 }
 

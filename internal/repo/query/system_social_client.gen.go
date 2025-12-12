@@ -33,7 +33,6 @@ func newSocialClient(db *gorm.DB, opts ...gen.DOOption) socialClient {
 	_socialClient.Updater = field.NewString(tableName, "updater")
 	_socialClient.CreatedAt = field.NewTime(tableName, "create_time")
 	_socialClient.UpdatedAt = field.NewTime(tableName, "update_time")
-	_socialClient.DeletedAt = field.NewField(tableName, "deleted_time")
 	_socialClient.Deleted = field.NewField(tableName, "deleted")
 	_socialClient.TenantID = field.NewInt64(tableName, "tenant_id")
 	_socialClient.Name = field.NewString(tableName, "name")
@@ -58,7 +57,6 @@ type socialClient struct {
 	Updater      field.String // 更新者
 	CreatedAt    field.Time   // 创建时间
 	UpdatedAt    field.Time   // 更新时间
-	DeletedAt    field.Field  // 删除时间
 	Deleted      field.Field  // 是否删除
 	TenantID     field.Int64  // 租户编号
 	Name         field.String // 应用名
@@ -89,7 +87,6 @@ func (s *socialClient) updateTableName(table string) *socialClient {
 	s.Updater = field.NewString(table, "updater")
 	s.CreatedAt = field.NewTime(table, "create_time")
 	s.UpdatedAt = field.NewTime(table, "update_time")
-	s.DeletedAt = field.NewField(table, "deleted_time")
 	s.Deleted = field.NewField(table, "deleted")
 	s.TenantID = field.NewInt64(table, "tenant_id")
 	s.Name = field.NewString(table, "name")
@@ -127,13 +124,12 @@ func (s *socialClient) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (s *socialClient) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 15)
+	s.fieldMap = make(map[string]field.Expr, 14)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["creator"] = s.Creator
 	s.fieldMap["updater"] = s.Updater
 	s.fieldMap["create_time"] = s.CreatedAt
 	s.fieldMap["update_time"] = s.UpdatedAt
-	s.fieldMap["deleted_time"] = s.DeletedAt
 	s.fieldMap["deleted"] = s.Deleted
 	s.fieldMap["tenant_id"] = s.TenantID
 	s.fieldMap["name"] = s.Name

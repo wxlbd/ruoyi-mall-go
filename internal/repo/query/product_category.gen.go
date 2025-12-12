@@ -39,7 +39,6 @@ func newProductCategory(db *gorm.DB, opts ...gen.DOOption) productCategory {
 	_productCategory.Updater = field.NewString(tableName, "updater")
 	_productCategory.CreatedAt = field.NewTime(tableName, "create_time")
 	_productCategory.UpdatedAt = field.NewTime(tableName, "update_time")
-	_productCategory.DeletedAt = field.NewField(tableName, "deleted_time")
 	_productCategory.Deleted = field.NewField(tableName, "deleted")
 
 	_productCategory.fillFieldMap()
@@ -62,7 +61,6 @@ type productCategory struct {
 	Updater     field.String // 更新者
 	CreatedAt   field.Time   // 创建时间
 	UpdatedAt   field.Time   // 更新时间
-	DeletedAt   field.Field  // 删除时间
 	Deleted     field.Field  // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -91,7 +89,6 @@ func (p *productCategory) updateTableName(table string) *productCategory {
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
 
 	p.fillFieldMap()
@@ -121,7 +118,7 @@ func (p *productCategory) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (p *productCategory) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 13)
+	p.fieldMap = make(map[string]field.Expr, 12)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["parent_id"] = p.ParentID
 	p.fieldMap["name"] = p.Name
@@ -133,7 +130,6 @@ func (p *productCategory) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 }
 

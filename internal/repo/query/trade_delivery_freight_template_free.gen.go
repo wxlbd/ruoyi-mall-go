@@ -37,7 +37,6 @@ func newTradeDeliveryFreightTemplateFree(db *gorm.DB, opts ...gen.DOOption) trad
 	_tradeDeliveryFreightTemplateFree.Updater = field.NewString(tableName, "updater")
 	_tradeDeliveryFreightTemplateFree.CreatedAt = field.NewTime(tableName, "create_time")
 	_tradeDeliveryFreightTemplateFree.UpdatedAt = field.NewTime(tableName, "update_time")
-	_tradeDeliveryFreightTemplateFree.DeletedAt = field.NewField(tableName, "deleted_time")
 	_tradeDeliveryFreightTemplateFree.Deleted = field.NewField(tableName, "deleted")
 
 	_tradeDeliveryFreightTemplateFree.fillFieldMap()
@@ -58,7 +57,6 @@ type tradeDeliveryFreightTemplateFree struct {
 	Updater    field.String  // 更新者
 	CreatedAt  field.Time    // 创建时间
 	UpdatedAt  field.Time    // 更新时间
-	DeletedAt  field.Field   // 删除时间
 	Deleted    field.Field   // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -85,7 +83,6 @@ func (t *tradeDeliveryFreightTemplateFree) updateTableName(table string) *tradeD
 	t.Updater = field.NewString(table, "updater")
 	t.CreatedAt = field.NewTime(table, "create_time")
 	t.UpdatedAt = field.NewTime(table, "update_time")
-	t.DeletedAt = field.NewField(table, "deleted_time")
 	t.Deleted = field.NewField(table, "deleted")
 
 	t.fillFieldMap()
@@ -119,7 +116,7 @@ func (t *tradeDeliveryFreightTemplateFree) GetFieldByName(fieldName string) (fie
 }
 
 func (t *tradeDeliveryFreightTemplateFree) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 11)
+	t.fieldMap = make(map[string]field.Expr, 10)
 	t.fieldMap["id"] = t.ID
 	t.fieldMap["template_id"] = t.TemplateID
 	t.fieldMap["area_ids"] = t.AreaIDs
@@ -129,7 +126,6 @@ func (t *tradeDeliveryFreightTemplateFree) fillFieldMap() {
 	t.fieldMap["updater"] = t.Updater
 	t.fieldMap["create_time"] = t.CreatedAt
 	t.fieldMap["update_time"] = t.UpdatedAt
-	t.fieldMap["deleted_time"] = t.DeletedAt
 	t.fieldMap["deleted"] = t.Deleted
 }
 

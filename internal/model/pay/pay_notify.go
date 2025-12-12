@@ -25,7 +25,7 @@ type PayNotifyTask struct {
 
 	CreatedAt time.Time      `gorm:"column:create_time;autoCreateTime;comment:创建时间" json:"createTime"`
 	UpdatedAt time.Time      `gorm:"column:update_time;autoUpdateTime;comment:更新时间" json:"updateTime"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_time;index;comment:删除时间" json:"deletedTime"`
+	DeletedAt gorm.DeletedAt `gorm:"column:deleted;index;comment:删除时间" json:"deletedTime"`
 	Deleted   bool           `gorm:"column:deleted;default:0;comment:是否删除" json:"deleted"`
 	Creator   string         `gorm:"column:creator;default:'';comment:创建者" json:"creator"`
 	Updater   string         `gorm:"column:updater;default:'';comment:更新者" json:"updater"`
@@ -46,7 +46,7 @@ type PayNotifyLog struct {
 
 	CreatedAt time.Time      `gorm:"column:create_time;autoCreateTime;comment:创建时间" json:"createTime"`
 	UpdatedAt time.Time      `gorm:"column:update_time;autoUpdateTime;comment:更新时间" json:"updateTime"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_time;index;comment:删除时间" json:"deletedTime"`
+	DeletedAt gorm.DeletedAt `gorm:"column:deleted;index;comment:删除时间" json:"deletedTime"`
 	Deleted   bool           `gorm:"column:deleted;default:0;comment:是否删除" json:"deleted"`
 	Creator   string         `gorm:"column:creator;default:'';comment:创建者" json:"creator"`
 	Updater   string         `gorm:"column:updater;default:'';comment:更新者" json:"updater"`

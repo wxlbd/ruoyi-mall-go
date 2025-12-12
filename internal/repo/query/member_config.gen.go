@@ -37,7 +37,7 @@ func newMemberConfig(db *gorm.DB, opts ...gen.DOOption) memberConfig {
 	_memberConfig.Updater = field.NewString(tableName, "updater")
 	_memberConfig.CreatedAt = field.NewTime(tableName, "create_time")
 	_memberConfig.UpdatedAt = field.NewTime(tableName, "update_time")
-	_memberConfig.DeletedAt = field.NewField(tableName, "deleted_time")
+	_memberConfig.DeletedAt = field.NewField(tableName, "deleted")
 	_memberConfig.Deleted = field.NewField(tableName, "deleted")
 
 	_memberConfig.fillFieldMap()
@@ -85,7 +85,7 @@ func (m *memberConfig) updateTableName(table string) *memberConfig {
 	m.Updater = field.NewString(table, "updater")
 	m.CreatedAt = field.NewTime(table, "create_time")
 	m.UpdatedAt = field.NewTime(table, "update_time")
-	m.DeletedAt = field.NewField(table, "deleted_time")
+	m.DeletedAt = field.NewField(table, "deleted")
 	m.Deleted = field.NewField(table, "deleted")
 
 	m.fillFieldMap()
@@ -125,7 +125,7 @@ func (m *memberConfig) fillFieldMap() {
 	m.fieldMap["updater"] = m.Updater
 	m.fieldMap["create_time"] = m.CreatedAt
 	m.fieldMap["update_time"] = m.UpdatedAt
-	m.fieldMap["deleted_time"] = m.DeletedAt
+	m.fieldMap["deleted"] = m.DeletedAt
 	m.fieldMap["deleted"] = m.Deleted
 }
 

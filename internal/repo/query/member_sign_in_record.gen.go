@@ -37,7 +37,6 @@ func newMemberSignInRecord(db *gorm.DB, opts ...gen.DOOption) memberSignInRecord
 	_memberSignInRecord.Updater = field.NewString(tableName, "updater")
 	_memberSignInRecord.CreatedAt = field.NewTime(tableName, "create_time")
 	_memberSignInRecord.UpdatedAt = field.NewTime(tableName, "update_time")
-	_memberSignInRecord.DeletedAt = field.NewField(tableName, "deleted_time")
 	_memberSignInRecord.Deleted = field.NewField(tableName, "deleted")
 
 	_memberSignInRecord.fillFieldMap()
@@ -58,7 +57,6 @@ type memberSignInRecord struct {
 	Updater    field.String // 更新者
 	CreatedAt  field.Time   // 创建时间
 	UpdatedAt  field.Time   // 更新时间
-	DeletedAt  field.Field  // 删除时间
 	Deleted    field.Field  // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -85,7 +83,6 @@ func (m *memberSignInRecord) updateTableName(table string) *memberSignInRecord {
 	m.Updater = field.NewString(table, "updater")
 	m.CreatedAt = field.NewTime(table, "create_time")
 	m.UpdatedAt = field.NewTime(table, "update_time")
-	m.DeletedAt = field.NewField(table, "deleted_time")
 	m.Deleted = field.NewField(table, "deleted")
 
 	m.fillFieldMap()
@@ -115,7 +112,7 @@ func (m *memberSignInRecord) GetFieldByName(fieldName string) (field.OrderExpr, 
 }
 
 func (m *memberSignInRecord) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 11)
+	m.fieldMap = make(map[string]field.Expr, 10)
 	m.fieldMap["id"] = m.ID
 	m.fieldMap["user_id"] = m.UserID
 	m.fieldMap["day"] = m.Day
@@ -125,7 +122,6 @@ func (m *memberSignInRecord) fillFieldMap() {
 	m.fieldMap["updater"] = m.Updater
 	m.fieldMap["create_time"] = m.CreatedAt
 	m.fieldMap["update_time"] = m.UpdatedAt
-	m.fieldMap["deleted_time"] = m.DeletedAt
 	m.fieldMap["deleted"] = m.Deleted
 }
 

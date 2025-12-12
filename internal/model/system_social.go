@@ -3,7 +3,6 @@ package model
 import (
 	"time"
 
-	"gorm.io/gorm"
 )
 
 // SocialUser 社交用户
@@ -13,7 +12,6 @@ type SocialUser struct {
 	Updater   string         `gorm:"size:64;default:'';comment:更新者"`
 	CreatedAt time.Time      `gorm:"column:create_time;autoCreateTime;comment:创建时间"`
 	UpdatedAt time.Time      `gorm:"column:update_time;autoUpdateTime;comment:更新时间"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_time;index;comment:删除时间"`
 	Deleted   BitBool        `gorm:"column:deleted;softDelete:flag;default:0;comment:是否删除"`
 
 	Type         int    `gorm:"column:type;not null;comment:社交类型"`
@@ -38,7 +36,6 @@ type SocialUserBind struct {
 	Updater   string         `gorm:"size:64;default:'';comment:更新者"`
 	CreatedAt time.Time      `gorm:"column:create_time;autoCreateTime;comment:创建时间"`
 	UpdatedAt time.Time      `gorm:"column:update_time;autoUpdateTime;comment:更新时间"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_time;index;comment:删除时间"`
 	Deleted   BitBool        `gorm:"column:deleted;softDelete:flag;default:0;comment:是否删除"`
 
 	UserID       int64 `gorm:"column:user_id;not null;comment:用户编号"`
@@ -58,7 +55,6 @@ type SocialClient struct {
 	Updater   string         `gorm:"size:64;default:'';comment:更新者"`
 	CreatedAt time.Time      `gorm:"column:create_time;autoCreateTime;comment:创建时间"`
 	UpdatedAt time.Time      `gorm:"column:update_time;autoUpdateTime;comment:更新时间"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_time;index;comment:删除时间"`
 	Deleted   BitBool        `gorm:"column:deleted;softDelete:flag;default:0;comment:是否删除"`
 	TenantID  int64          `gorm:"column:tenant_id;default:0;comment:租户编号"`
 

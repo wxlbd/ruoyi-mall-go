@@ -46,7 +46,7 @@ func newPromotionCoupon(db *gorm.DB, opts ...gen.DOOption) promotionCoupon {
 	_promotionCoupon.Updater = field.NewString(tableName, "updater")
 	_promotionCoupon.CreatedAt = field.NewTime(tableName, "create_time")
 	_promotionCoupon.UpdatedAt = field.NewTime(tableName, "update_time")
-	_promotionCoupon.DeletedAt = field.NewField(tableName, "deleted_time")
+	_promotionCoupon.DeletedAt = field.NewField(tableName, "deleted")
 	_promotionCoupon.Deleted = field.NewBool(tableName, "deleted")
 
 	_promotionCoupon.fillFieldMap()
@@ -112,7 +112,7 @@ func (p *promotionCoupon) updateTableName(table string) *promotionCoupon {
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
+	p.DeletedAt = field.NewField(table, "deleted")
 	p.Deleted = field.NewBool(table, "deleted")
 
 	p.fillFieldMap()
@@ -161,7 +161,7 @@ func (p *promotionCoupon) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
+	p.fieldMap["deleted"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 }
 

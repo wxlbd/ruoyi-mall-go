@@ -36,7 +36,6 @@ func newProductPropertyValue(db *gorm.DB, opts ...gen.DOOption) productPropertyV
 	_productPropertyValue.Updater = field.NewString(tableName, "updater")
 	_productPropertyValue.CreatedAt = field.NewTime(tableName, "create_time")
 	_productPropertyValue.UpdatedAt = field.NewTime(tableName, "update_time")
-	_productPropertyValue.DeletedAt = field.NewField(tableName, "deleted_time")
 	_productPropertyValue.Deleted = field.NewField(tableName, "deleted")
 
 	_productPropertyValue.fillFieldMap()
@@ -56,7 +55,6 @@ type productPropertyValue struct {
 	Updater    field.String // 更新者
 	CreatedAt  field.Time   // 创建时间
 	UpdatedAt  field.Time   // 更新时间
-	DeletedAt  field.Field  // 删除时间
 	Deleted    field.Field  // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -82,7 +80,6 @@ func (p *productPropertyValue) updateTableName(table string) *productPropertyVal
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
 
 	p.fillFieldMap()
@@ -112,7 +109,7 @@ func (p *productPropertyValue) GetFieldByName(fieldName string) (field.OrderExpr
 }
 
 func (p *productPropertyValue) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 10)
+	p.fieldMap = make(map[string]field.Expr, 9)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["property_id"] = p.PropertyID
 	p.fieldMap["name"] = p.Name
@@ -121,7 +118,6 @@ func (p *productPropertyValue) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 }
 

@@ -38,7 +38,6 @@ func newPromotionSeckillConfig(db *gorm.DB, opts ...gen.DOOption) promotionSecki
 	_promotionSeckillConfig.Updater = field.NewString(tableName, "updater")
 	_promotionSeckillConfig.CreatedAt = field.NewTime(tableName, "create_time")
 	_promotionSeckillConfig.UpdatedAt = field.NewTime(tableName, "update_time")
-	_promotionSeckillConfig.DeletedAt = field.NewField(tableName, "deleted_time")
 	_promotionSeckillConfig.Deleted = field.NewField(tableName, "deleted")
 	_promotionSeckillConfig.TenantID = field.NewInt64(tableName, "tenant_id")
 
@@ -61,7 +60,6 @@ type promotionSeckillConfig struct {
 	Updater       field.String // 更新者
 	CreatedAt     field.Time   // 创建时间
 	UpdatedAt     field.Time   // 更新时间
-	DeletedAt     field.Field  // 删除时间
 	Deleted       field.Field  // 是否删除
 	TenantID      field.Int64  // 租户编号
 
@@ -90,7 +88,6 @@ func (p *promotionSeckillConfig) updateTableName(table string) *promotionSeckill
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
 	p.TenantID = field.NewInt64(table, "tenant_id")
 
@@ -121,7 +118,7 @@ func (p *promotionSeckillConfig) GetFieldByName(fieldName string) (field.OrderEx
 }
 
 func (p *promotionSeckillConfig) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 13)
+	p.fieldMap = make(map[string]field.Expr, 12)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["name"] = p.Name
 	p.fieldMap["start_time"] = p.StartTime
@@ -132,7 +129,6 @@ func (p *promotionSeckillConfig) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 	p.fieldMap["tenant_id"] = p.TenantID
 }

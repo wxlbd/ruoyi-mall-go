@@ -54,7 +54,6 @@ func newPayOrder(db *gorm.DB, opts ...gen.DOOption) payOrder {
 	_payOrder.Updater = field.NewString(tableName, "updater")
 	_payOrder.CreatedAt = field.NewTime(tableName, "create_time")
 	_payOrder.UpdatedAt = field.NewTime(tableName, "update_time")
-	_payOrder.DeletedAt = field.NewField(tableName, "deleted_time")
 	_payOrder.Deleted = field.NewField(tableName, "deleted")
 
 	_payOrder.fillFieldMap()
@@ -92,7 +91,6 @@ type payOrder struct {
 	Updater         field.String // 更新者
 	CreatedAt       field.Time   // 创建时间
 	UpdatedAt       field.Time   // 更新时间
-	DeletedAt       field.Field  // 删除时间
 	Deleted         field.Field  // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -136,7 +134,6 @@ func (p *payOrder) updateTableName(table string) *payOrder {
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
 
 	p.fillFieldMap()
@@ -162,7 +159,7 @@ func (p *payOrder) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (p *payOrder) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 28)
+	p.fieldMap = make(map[string]field.Expr, 27)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["app_id"] = p.AppID
 	p.fieldMap["channel_id"] = p.ChannelID
@@ -189,7 +186,6 @@ func (p *payOrder) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 }
 

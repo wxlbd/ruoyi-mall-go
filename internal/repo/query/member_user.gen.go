@@ -53,7 +53,6 @@ func newMemberUser(db *gorm.DB, opts ...gen.DOOption) memberUser {
 	_memberUser.Updater = field.NewString(tableName, "updater")
 	_memberUser.CreatedAt = field.NewTime(tableName, "create_time")
 	_memberUser.UpdatedAt = field.NewTime(tableName, "update_time")
-	_memberUser.DeletedAt = field.NewField(tableName, "deleted_time")
 	_memberUser.Deleted = field.NewField(tableName, "deleted")
 	_memberUser.BrokerageEnabled = field.NewField(tableName, "brokerage_enabled")
 
@@ -91,7 +90,6 @@ type memberUser struct {
 	Updater          field.String // 更新者
 	CreatedAt        field.Time   // 创建时间
 	UpdatedAt        field.Time   // 更新时间
-	DeletedAt        field.Field  // 删除时间
 	Deleted          field.Field  // 是否删除
 	BrokerageEnabled field.Field  // 是否成为推广员
 
@@ -135,7 +133,6 @@ func (m *memberUser) updateTableName(table string) *memberUser {
 	m.Updater = field.NewString(table, "updater")
 	m.CreatedAt = field.NewTime(table, "create_time")
 	m.UpdatedAt = field.NewTime(table, "update_time")
-	m.DeletedAt = field.NewField(table, "deleted_time")
 	m.Deleted = field.NewField(table, "deleted")
 	m.BrokerageEnabled = field.NewField(table, "brokerage_enabled")
 
@@ -164,7 +161,7 @@ func (m *memberUser) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *memberUser) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 28)
+	m.fieldMap = make(map[string]field.Expr, 27)
 	m.fieldMap["id"] = m.ID
 	m.fieldMap["mobile"] = m.Mobile
 	m.fieldMap["password"] = m.Password
@@ -190,7 +187,6 @@ func (m *memberUser) fillFieldMap() {
 	m.fieldMap["updater"] = m.Updater
 	m.fieldMap["create_time"] = m.CreatedAt
 	m.fieldMap["update_time"] = m.UpdatedAt
-	m.fieldMap["deleted_time"] = m.DeletedAt
 	m.fieldMap["deleted"] = m.Deleted
 	m.fieldMap["brokerage_enabled"] = m.BrokerageEnabled
 }

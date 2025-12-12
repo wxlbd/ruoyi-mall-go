@@ -33,7 +33,7 @@ func newAfterSale(db *gorm.DB, opts ...gen.DOOption) afterSale {
 	_afterSale.Updater = field.NewString(tableName, "updater")
 	_afterSale.CreatedAt = field.NewTime(tableName, "create_time")
 	_afterSale.UpdatedAt = field.NewTime(tableName, "update_time")
-	_afterSale.DeletedAt = field.NewTime(tableName, "deleted_time")
+	_afterSale.DeletedAt = field.NewTime(tableName, "deleted")
 	_afterSale.Deleted = field.NewBool(tableName, "deleted")
 	_afterSale.No = field.NewString(tableName, "no")
 	_afterSale.Status = field.NewInt(tableName, "status")
@@ -129,7 +129,7 @@ func (a *afterSale) updateTableName(table string) *afterSale {
 	a.Updater = field.NewString(table, "updater")
 	a.CreatedAt = field.NewTime(table, "create_time")
 	a.UpdatedAt = field.NewTime(table, "update_time")
-	a.DeletedAt = field.NewTime(table, "deleted_time")
+	a.DeletedAt = field.NewTime(table, "deleted")
 	a.Deleted = field.NewBool(table, "deleted")
 	a.No = field.NewString(table, "no")
 	a.Status = field.NewInt(table, "status")
@@ -191,7 +191,7 @@ func (a *afterSale) fillFieldMap() {
 	a.fieldMap["updater"] = a.Updater
 	a.fieldMap["create_time"] = a.CreatedAt
 	a.fieldMap["update_time"] = a.UpdatedAt
-	a.fieldMap["deleted_time"] = a.DeletedAt
+	a.fieldMap["deleted"] = a.DeletedAt
 	a.fieldMap["deleted"] = a.Deleted
 	a.fieldMap["no"] = a.No
 	a.fieldMap["status"] = a.Status

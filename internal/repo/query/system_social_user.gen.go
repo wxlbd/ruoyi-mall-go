@@ -33,7 +33,6 @@ func newSocialUser(db *gorm.DB, opts ...gen.DOOption) socialUser {
 	_socialUser.Updater = field.NewString(tableName, "updater")
 	_socialUser.CreatedAt = field.NewTime(tableName, "create_time")
 	_socialUser.UpdatedAt = field.NewTime(tableName, "update_time")
-	_socialUser.DeletedAt = field.NewField(tableName, "deleted_time")
 	_socialUser.Deleted = field.NewField(tableName, "deleted")
 	_socialUser.Type = field.NewInt(tableName, "type")
 	_socialUser.Openid = field.NewString(tableName, "openid")
@@ -59,7 +58,6 @@ type socialUser struct {
 	Updater      field.String // 更新者
 	CreatedAt    field.Time   // 创建时间
 	UpdatedAt    field.Time   // 更新时间
-	DeletedAt    field.Field  // 删除时间
 	Deleted      field.Field  // 是否删除
 	Type         field.Int    // 社交类型
 	Openid       field.String // 社交 openid
@@ -91,7 +89,6 @@ func (s *socialUser) updateTableName(table string) *socialUser {
 	s.Updater = field.NewString(table, "updater")
 	s.CreatedAt = field.NewTime(table, "create_time")
 	s.UpdatedAt = field.NewTime(table, "update_time")
-	s.DeletedAt = field.NewField(table, "deleted_time")
 	s.Deleted = field.NewField(table, "deleted")
 	s.Type = field.NewInt(table, "type")
 	s.Openid = field.NewString(table, "openid")
@@ -128,13 +125,12 @@ func (s *socialUser) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *socialUser) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 16)
+	s.fieldMap = make(map[string]field.Expr, 15)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["creator"] = s.Creator
 	s.fieldMap["updater"] = s.Updater
 	s.fieldMap["create_time"] = s.CreatedAt
 	s.fieldMap["update_time"] = s.UpdatedAt
-	s.fieldMap["deleted_time"] = s.DeletedAt
 	s.fieldMap["deleted"] = s.Deleted
 	s.fieldMap["type"] = s.Type
 	s.fieldMap["openid"] = s.Openid

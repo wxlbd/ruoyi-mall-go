@@ -40,7 +40,7 @@ func newTradeOrderLog(db *gorm.DB, opts ...gen.DOOption) tradeOrderLog {
 	_tradeOrderLog.Updater = field.NewString(tableName, "updater")
 	_tradeOrderLog.CreatedAt = field.NewTime(tableName, "create_time")
 	_tradeOrderLog.UpdatedAt = field.NewTime(tableName, "update_time")
-	_tradeOrderLog.DeletedAt = field.NewField(tableName, "deleted_time")
+	_tradeOrderLog.DeletedAt = field.NewField(tableName, "deleted")
 	_tradeOrderLog.Deleted = field.NewBool(tableName, "deleted")
 
 	_tradeOrderLog.fillFieldMap()
@@ -94,7 +94,7 @@ func (t *tradeOrderLog) updateTableName(table string) *tradeOrderLog {
 	t.Updater = field.NewString(table, "updater")
 	t.CreatedAt = field.NewTime(table, "create_time")
 	t.UpdatedAt = field.NewTime(table, "update_time")
-	t.DeletedAt = field.NewField(table, "deleted_time")
+	t.DeletedAt = field.NewField(table, "deleted")
 	t.Deleted = field.NewBool(table, "deleted")
 
 	t.fillFieldMap()
@@ -137,7 +137,7 @@ func (t *tradeOrderLog) fillFieldMap() {
 	t.fieldMap["updater"] = t.Updater
 	t.fieldMap["create_time"] = t.CreatedAt
 	t.fieldMap["update_time"] = t.UpdatedAt
-	t.fieldMap["deleted_time"] = t.DeletedAt
+	t.fieldMap["deleted"] = t.DeletedAt
 	t.fieldMap["deleted"] = t.Deleted
 }
 

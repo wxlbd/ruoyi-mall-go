@@ -33,7 +33,6 @@ func newSocialUserBind(db *gorm.DB, opts ...gen.DOOption) socialUserBind {
 	_socialUserBind.Updater = field.NewString(tableName, "updater")
 	_socialUserBind.CreatedAt = field.NewTime(tableName, "create_time")
 	_socialUserBind.UpdatedAt = field.NewTime(tableName, "update_time")
-	_socialUserBind.DeletedAt = field.NewField(tableName, "deleted_time")
 	_socialUserBind.Deleted = field.NewField(tableName, "deleted")
 	_socialUserBind.UserID = field.NewInt64(tableName, "user_id")
 	_socialUserBind.UserType = field.NewInt(tableName, "user_type")
@@ -54,7 +53,6 @@ type socialUserBind struct {
 	Updater      field.String // 更新者
 	CreatedAt    field.Time   // 创建时间
 	UpdatedAt    field.Time   // 更新时间
-	DeletedAt    field.Field  // 删除时间
 	Deleted      field.Field  // 是否删除
 	UserID       field.Int64  // 用户编号
 	UserType     field.Int    // 用户类型
@@ -81,7 +79,6 @@ func (s *socialUserBind) updateTableName(table string) *socialUserBind {
 	s.Updater = field.NewString(table, "updater")
 	s.CreatedAt = field.NewTime(table, "create_time")
 	s.UpdatedAt = field.NewTime(table, "update_time")
-	s.DeletedAt = field.NewField(table, "deleted_time")
 	s.Deleted = field.NewField(table, "deleted")
 	s.UserID = field.NewInt64(table, "user_id")
 	s.UserType = field.NewInt(table, "user_type")
@@ -115,13 +112,12 @@ func (s *socialUserBind) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (s *socialUserBind) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 11)
+	s.fieldMap = make(map[string]field.Expr, 10)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["creator"] = s.Creator
 	s.fieldMap["updater"] = s.Updater
 	s.fieldMap["create_time"] = s.CreatedAt
 	s.fieldMap["update_time"] = s.UpdatedAt
-	s.fieldMap["deleted_time"] = s.DeletedAt
 	s.fieldMap["deleted"] = s.Deleted
 	s.fieldMap["user_id"] = s.UserID
 	s.fieldMap["user_type"] = s.UserType

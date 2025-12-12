@@ -4,7 +4,6 @@ import (
 	"backend-go/internal/model"
 	"time"
 
-	"gorm.io/gorm"
 )
 
 // ProductComment 商品评价
@@ -36,7 +35,6 @@ type ProductComment struct {
 	Updater   string         `gorm:"size:64;default:'';comment:更新者"`
 	CreatedAt time.Time      `gorm:"column:create_time;autoCreateTime;comment:创建时间"`
 	UpdatedAt time.Time      `gorm:"column:update_time;autoUpdateTime;comment:更新时间"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_time;index;comment:删除时间"`
 	Deleted   model.BitBool  `gorm:"column:deleted;softDelete:flag;default:0;comment:是否删除"`
 }
 

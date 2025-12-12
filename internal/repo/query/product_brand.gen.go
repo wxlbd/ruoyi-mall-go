@@ -38,7 +38,6 @@ func newProductBrand(db *gorm.DB, opts ...gen.DOOption) productBrand {
 	_productBrand.Updater = field.NewString(tableName, "updater")
 	_productBrand.CreatedAt = field.NewTime(tableName, "create_time")
 	_productBrand.UpdatedAt = field.NewTime(tableName, "update_time")
-	_productBrand.DeletedAt = field.NewField(tableName, "deleted_time")
 	_productBrand.Deleted = field.NewField(tableName, "deleted")
 
 	_productBrand.fillFieldMap()
@@ -60,7 +59,6 @@ type productBrand struct {
 	Updater     field.String // 更新者
 	CreatedAt   field.Time   // 创建时间
 	UpdatedAt   field.Time   // 更新时间
-	DeletedAt   field.Field  // 删除时间
 	Deleted     field.Field  // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -88,7 +86,6 @@ func (p *productBrand) updateTableName(table string) *productBrand {
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
 
 	p.fillFieldMap()
@@ -118,7 +115,7 @@ func (p *productBrand) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (p *productBrand) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 12)
+	p.fieldMap = make(map[string]field.Expr, 11)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["name"] = p.Name
 	p.fieldMap["pic_url"] = p.PicURL
@@ -129,7 +126,6 @@ func (p *productBrand) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 }
 

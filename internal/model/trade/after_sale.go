@@ -9,7 +9,7 @@ type AfterSale struct {
 	Updater          string    `gorm:"column:updater" json:"updater"`
 	CreatedAt        time.Time `gorm:"column:create_time" json:"createTime"`
 	UpdatedAt        time.Time `gorm:"column:update_time" json:"updateTime"`
-	DeletedAt        time.Time `gorm:"column:deleted_time" json:"deletedTime"`
+	DeletedAt        time.Time `gorm:"column:deleted" json:"deletedTime"`
 	Deleted          bool      `gorm:"column:deleted" json:"deleted"`
 	No               string    `gorm:"column:no" json:"no"`
 	Status           int       `gorm:"column:status" json:"status"`

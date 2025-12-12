@@ -39,7 +39,6 @@ func newMemberAddress(db *gorm.DB, opts ...gen.DOOption) memberAddress {
 	_memberAddress.Updater = field.NewString(tableName, "updater")
 	_memberAddress.CreatedAt = field.NewTime(tableName, "create_time")
 	_memberAddress.UpdatedAt = field.NewTime(tableName, "update_time")
-	_memberAddress.DeletedAt = field.NewField(tableName, "deleted_time")
 	_memberAddress.Deleted = field.NewField(tableName, "deleted")
 
 	_memberAddress.fillFieldMap()
@@ -62,7 +61,6 @@ type memberAddress struct {
 	Updater       field.String // 更新者
 	CreatedAt     field.Time   // 创建时间
 	UpdatedAt     field.Time   // 更新时间
-	DeletedAt     field.Field  // 删除时间
 	Deleted       field.Field  // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -91,7 +89,6 @@ func (m *memberAddress) updateTableName(table string) *memberAddress {
 	m.Updater = field.NewString(table, "updater")
 	m.CreatedAt = field.NewTime(table, "create_time")
 	m.UpdatedAt = field.NewTime(table, "update_time")
-	m.DeletedAt = field.NewField(table, "deleted_time")
 	m.Deleted = field.NewField(table, "deleted")
 
 	m.fillFieldMap()
@@ -121,7 +118,7 @@ func (m *memberAddress) GetFieldByName(fieldName string) (field.OrderExpr, bool)
 }
 
 func (m *memberAddress) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 13)
+	m.fieldMap = make(map[string]field.Expr, 12)
 	m.fieldMap["id"] = m.ID
 	m.fieldMap["user_id"] = m.UserID
 	m.fieldMap["name"] = m.Name
@@ -133,7 +130,6 @@ func (m *memberAddress) fillFieldMap() {
 	m.fieldMap["updater"] = m.Updater
 	m.fieldMap["create_time"] = m.CreatedAt
 	m.fieldMap["update_time"] = m.UpdatedAt
-	m.fieldMap["deleted_time"] = m.DeletedAt
 	m.fieldMap["deleted"] = m.Deleted
 }
 

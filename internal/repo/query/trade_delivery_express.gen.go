@@ -38,7 +38,6 @@ func newTradeDeliveryExpress(db *gorm.DB, opts ...gen.DOOption) tradeDeliveryExp
 	_tradeDeliveryExpress.Updater = field.NewString(tableName, "updater")
 	_tradeDeliveryExpress.CreatedAt = field.NewTime(tableName, "create_time")
 	_tradeDeliveryExpress.UpdatedAt = field.NewTime(tableName, "update_time")
-	_tradeDeliveryExpress.DeletedAt = field.NewField(tableName, "deleted_time")
 	_tradeDeliveryExpress.Deleted = field.NewField(tableName, "deleted")
 	_tradeDeliveryExpress.TenantID = field.NewInt64(tableName, "tenant_id")
 
@@ -61,7 +60,6 @@ type tradeDeliveryExpress struct {
 	Updater   field.String // 更新者
 	CreatedAt field.Time   // 创建时间
 	UpdatedAt field.Time   // 更新时间
-	DeletedAt field.Field  // 删除时间
 	Deleted   field.Field  // 是否删除
 	TenantID  field.Int64  // 租户编号
 
@@ -90,7 +88,6 @@ func (t *tradeDeliveryExpress) updateTableName(table string) *tradeDeliveryExpre
 	t.Updater = field.NewString(table, "updater")
 	t.CreatedAt = field.NewTime(table, "create_time")
 	t.UpdatedAt = field.NewTime(table, "update_time")
-	t.DeletedAt = field.NewField(table, "deleted_time")
 	t.Deleted = field.NewField(table, "deleted")
 	t.TenantID = field.NewInt64(table, "tenant_id")
 
@@ -121,7 +118,7 @@ func (t *tradeDeliveryExpress) GetFieldByName(fieldName string) (field.OrderExpr
 }
 
 func (t *tradeDeliveryExpress) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 13)
+	t.fieldMap = make(map[string]field.Expr, 12)
 	t.fieldMap["id"] = t.ID
 	t.fieldMap["code"] = t.Code
 	t.fieldMap["name"] = t.Name
@@ -132,7 +129,6 @@ func (t *tradeDeliveryExpress) fillFieldMap() {
 	t.fieldMap["updater"] = t.Updater
 	t.fieldMap["create_time"] = t.CreatedAt
 	t.fieldMap["update_time"] = t.UpdatedAt
-	t.fieldMap["deleted_time"] = t.DeletedAt
 	t.fieldMap["deleted"] = t.Deleted
 	t.fieldMap["tenant_id"] = t.TenantID
 }

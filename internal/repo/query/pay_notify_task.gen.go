@@ -43,7 +43,7 @@ func newPayNotifyTask(db *gorm.DB, opts ...gen.DOOption) payNotifyTask {
 	_payNotifyTask.NotifyURL = field.NewString(tableName, "notify_url")
 	_payNotifyTask.CreatedAt = field.NewTime(tableName, "create_time")
 	_payNotifyTask.UpdatedAt = field.NewTime(tableName, "update_time")
-	_payNotifyTask.DeletedAt = field.NewField(tableName, "deleted_time")
+	_payNotifyTask.DeletedAt = field.NewField(tableName, "deleted")
 	_payNotifyTask.Deleted = field.NewBool(tableName, "deleted")
 	_payNotifyTask.Creator = field.NewString(tableName, "creator")
 	_payNotifyTask.Updater = field.NewString(tableName, "updater")
@@ -107,7 +107,7 @@ func (p *payNotifyTask) updateTableName(table string) *payNotifyTask {
 	p.NotifyURL = field.NewString(table, "notify_url")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
+	p.DeletedAt = field.NewField(table, "deleted")
 	p.Deleted = field.NewBool(table, "deleted")
 	p.Creator = field.NewString(table, "creator")
 	p.Updater = field.NewString(table, "updater")
@@ -155,7 +155,7 @@ func (p *payNotifyTask) fillFieldMap() {
 	p.fieldMap["notify_url"] = p.NotifyURL
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
+	p.fieldMap["deleted"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 	p.fieldMap["creator"] = p.Creator
 	p.fieldMap["updater"] = p.Updater

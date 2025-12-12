@@ -43,7 +43,6 @@ func newPayOrderExtension(db *gorm.DB, opts ...gen.DOOption) payOrderExtension {
 	_payOrderExtension.Updater = field.NewString(tableName, "updater")
 	_payOrderExtension.CreatedAt = field.NewTime(tableName, "create_time")
 	_payOrderExtension.UpdatedAt = field.NewTime(tableName, "update_time")
-	_payOrderExtension.DeletedAt = field.NewField(tableName, "deleted_time")
 	_payOrderExtension.Deleted = field.NewField(tableName, "deleted")
 
 	_payOrderExtension.fillFieldMap()
@@ -70,7 +69,6 @@ type payOrderExtension struct {
 	Updater           field.String // 更新者
 	CreatedAt         field.Time   // 创建时间
 	UpdatedAt         field.Time   // 更新时间
-	DeletedAt         field.Field  // 删除时间
 	Deleted           field.Field  // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -103,7 +101,6 @@ func (p *payOrderExtension) updateTableName(table string) *payOrderExtension {
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
 
 	p.fillFieldMap()
@@ -133,7 +130,7 @@ func (p *payOrderExtension) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (p *payOrderExtension) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 17)
+	p.fieldMap = make(map[string]field.Expr, 16)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["no"] = p.No
 	p.fieldMap["order_id"] = p.OrderID
@@ -149,7 +146,6 @@ func (p *payOrderExtension) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 }
 

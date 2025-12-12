@@ -45,7 +45,7 @@ func newBrokerageRecord(db *gorm.DB, opts ...gen.DOOption) brokerageRecord {
 	_brokerageRecord.Updater = field.NewString(tableName, "updater")
 	_brokerageRecord.CreatedAt = field.NewTime(tableName, "create_time")
 	_brokerageRecord.UpdatedAt = field.NewTime(tableName, "update_time")
-	_brokerageRecord.DeletedAt = field.NewField(tableName, "deleted_time")
+	_brokerageRecord.DeletedAt = field.NewField(tableName, "deleted")
 	_brokerageRecord.Deleted = field.NewBool(tableName, "deleted")
 
 	_brokerageRecord.fillFieldMap()
@@ -109,7 +109,7 @@ func (b *brokerageRecord) updateTableName(table string) *brokerageRecord {
 	b.Updater = field.NewString(table, "updater")
 	b.CreatedAt = field.NewTime(table, "create_time")
 	b.UpdatedAt = field.NewTime(table, "update_time")
-	b.DeletedAt = field.NewField(table, "deleted_time")
+	b.DeletedAt = field.NewField(table, "deleted")
 	b.Deleted = field.NewBool(table, "deleted")
 
 	b.fillFieldMap()
@@ -157,7 +157,7 @@ func (b *brokerageRecord) fillFieldMap() {
 	b.fieldMap["updater"] = b.Updater
 	b.fieldMap["create_time"] = b.CreatedAt
 	b.fieldMap["update_time"] = b.UpdatedAt
-	b.fieldMap["deleted_time"] = b.DeletedAt
+	b.fieldMap["deleted"] = b.DeletedAt
 	b.fieldMap["deleted"] = b.Deleted
 }
 

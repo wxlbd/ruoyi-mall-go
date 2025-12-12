@@ -53,7 +53,7 @@ func newPayRefund(db *gorm.DB, opts ...gen.DOOption) payRefund {
 	_payRefund.ChannelNotifyData = field.NewString(tableName, "channel_notify_data")
 	_payRefund.CreatedAt = field.NewTime(tableName, "create_time")
 	_payRefund.UpdatedAt = field.NewTime(tableName, "update_time")
-	_payRefund.DeletedAt = field.NewField(tableName, "deleted_time")
+	_payRefund.DeletedAt = field.NewField(tableName, "deleted")
 	_payRefund.Deleted = field.NewBool(tableName, "deleted")
 	_payRefund.Creator = field.NewString(tableName, "creator")
 	_payRefund.Updater = field.NewString(tableName, "updater")
@@ -137,7 +137,7 @@ func (p *payRefund) updateTableName(table string) *payRefund {
 	p.ChannelNotifyData = field.NewString(table, "channel_notify_data")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
+	p.DeletedAt = field.NewField(table, "deleted")
 	p.Deleted = field.NewBool(table, "deleted")
 	p.Creator = field.NewString(table, "creator")
 	p.Updater = field.NewString(table, "updater")
@@ -193,7 +193,7 @@ func (p *payRefund) fillFieldMap() {
 	p.fieldMap["channel_notify_data"] = p.ChannelNotifyData
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
+	p.fieldMap["deleted"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 	p.fieldMap["creator"] = p.Creator
 	p.fieldMap["updater"] = p.Updater

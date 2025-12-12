@@ -46,7 +46,6 @@ func newProductSku(db *gorm.DB, opts ...gen.DOOption) productSku {
 	_productSku.Updater = field.NewString(tableName, "updater")
 	_productSku.CreatedAt = field.NewTime(tableName, "create_time")
 	_productSku.UpdatedAt = field.NewTime(tableName, "update_time")
-	_productSku.DeletedAt = field.NewField(tableName, "deleted_time")
 	_productSku.Deleted = field.NewField(tableName, "deleted")
 
 	_productSku.fillFieldMap()
@@ -76,7 +75,6 @@ type productSku struct {
 	Updater              field.String  // 更新者
 	CreatedAt            field.Time    // 创建时间
 	UpdatedAt            field.Time    // 更新时间
-	DeletedAt            field.Field   // 删除时间
 	Deleted              field.Field   // 是否删除
 
 	fieldMap map[string]field.Expr
@@ -112,7 +110,6 @@ func (p *productSku) updateTableName(table string) *productSku {
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
 
 	p.fillFieldMap()
@@ -140,7 +137,7 @@ func (p *productSku) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (p *productSku) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 20)
+	p.fieldMap = make(map[string]field.Expr, 19)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["spu_id"] = p.SpuID
 	p.fieldMap["properties"] = p.Properties
@@ -159,7 +156,6 @@ func (p *productSku) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 }
 

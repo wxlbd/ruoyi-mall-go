@@ -3,7 +3,6 @@ package model
 import (
 	"time"
 
-	"gorm.io/gorm"
 )
 
 // SystemMailAccount 邮箱账号
@@ -20,7 +19,6 @@ type SystemMailAccount struct {
 	Updater        string         `gorm:"column:updater;size:64;default:'';comment:更新者" json:"updater"`
 	CreatedAt      time.Time      `gorm:"column:create_time;autoCreateTime;comment:创建时间" json:"createTime"`
 	UpdatedAt      time.Time      `gorm:"column:update_time;autoUpdateTime;comment:更新时间" json:"updateTime"`
-	DeletedAt      gorm.DeletedAt `gorm:"column:deleted_time;index;comment:删除时间" json:"-"`
 	Deleted        BitBool        `gorm:"column:deleted;softDelete:flag;default:0;comment:是否删除" json:"-"`
 }
 

@@ -43,7 +43,7 @@ func newPromotionRewardActivity(db *gorm.DB, opts ...gen.DOOption) promotionRewa
 	_promotionRewardActivity.Updater = field.NewString(tableName, "updater")
 	_promotionRewardActivity.CreatedAt = field.NewTime(tableName, "create_time")
 	_promotionRewardActivity.UpdatedAt = field.NewTime(tableName, "update_time")
-	_promotionRewardActivity.DeletedAt = field.NewField(tableName, "deleted_time")
+	_promotionRewardActivity.DeletedAt = field.NewField(tableName, "deleted")
 	_promotionRewardActivity.Deleted = field.NewBool(tableName, "deleted")
 
 	_promotionRewardActivity.fillFieldMap()
@@ -103,7 +103,7 @@ func (p *promotionRewardActivity) updateTableName(table string) *promotionReward
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
+	p.DeletedAt = field.NewField(table, "deleted")
 	p.Deleted = field.NewBool(table, "deleted")
 
 	p.fillFieldMap()
@@ -149,7 +149,7 @@ func (p *promotionRewardActivity) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
+	p.fieldMap["deleted"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 }
 

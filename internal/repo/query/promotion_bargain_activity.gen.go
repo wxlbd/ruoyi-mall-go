@@ -50,7 +50,6 @@ func newPromotionBargainActivity(db *gorm.DB, opts ...gen.DOOption) promotionBar
 	_promotionBargainActivity.Updater = field.NewString(tableName, "updater")
 	_promotionBargainActivity.CreatedAt = field.NewTime(tableName, "create_time")
 	_promotionBargainActivity.UpdatedAt = field.NewTime(tableName, "update_time")
-	_promotionBargainActivity.DeletedAt = field.NewField(tableName, "deleted_time")
 	_promotionBargainActivity.Deleted = field.NewField(tableName, "deleted")
 	_promotionBargainActivity.TenantID = field.NewInt64(tableName, "tenant_id")
 
@@ -85,7 +84,6 @@ type promotionBargainActivity struct {
 	Updater           field.String // 更新者
 	CreatedAt         field.Time   // 创建时间
 	UpdatedAt         field.Time   // 更新时间
-	DeletedAt         field.Field  // 删除时间
 	Deleted           field.Field  // 是否删除
 	TenantID          field.Int64  // 租户编号
 
@@ -126,7 +124,6 @@ func (p *promotionBargainActivity) updateTableName(table string) *promotionBarga
 	p.Updater = field.NewString(table, "updater")
 	p.CreatedAt = field.NewTime(table, "create_time")
 	p.UpdatedAt = field.NewTime(table, "update_time")
-	p.DeletedAt = field.NewField(table, "deleted_time")
 	p.Deleted = field.NewField(table, "deleted")
 	p.TenantID = field.NewInt64(table, "tenant_id")
 
@@ -157,7 +154,7 @@ func (p *promotionBargainActivity) GetFieldByName(fieldName string) (field.Order
 }
 
 func (p *promotionBargainActivity) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 25)
+	p.fieldMap = make(map[string]field.Expr, 24)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["name"] = p.Name
 	p.fieldMap["start_time"] = p.StartTime
@@ -180,7 +177,6 @@ func (p *promotionBargainActivity) fillFieldMap() {
 	p.fieldMap["updater"] = p.Updater
 	p.fieldMap["create_time"] = p.CreatedAt
 	p.fieldMap["update_time"] = p.UpdatedAt
-	p.fieldMap["deleted_time"] = p.DeletedAt
 	p.fieldMap["deleted"] = p.Deleted
 	p.fieldMap["tenant_id"] = p.TenantID
 }

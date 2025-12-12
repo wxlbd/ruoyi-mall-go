@@ -51,7 +51,7 @@ func newBrokerageWithdraw(db *gorm.DB, opts ...gen.DOOption) brokerageWithdraw {
 	_brokerageWithdraw.Updater = field.NewString(tableName, "updater")
 	_brokerageWithdraw.CreatedAt = field.NewTime(tableName, "create_time")
 	_brokerageWithdraw.UpdatedAt = field.NewTime(tableName, "update_time")
-	_brokerageWithdraw.DeletedAt = field.NewField(tableName, "deleted_time")
+	_brokerageWithdraw.DeletedAt = field.NewField(tableName, "deleted")
 	_brokerageWithdraw.Deleted = field.NewBool(tableName, "deleted")
 
 	_brokerageWithdraw.fillFieldMap()
@@ -127,7 +127,7 @@ func (b *brokerageWithdraw) updateTableName(table string) *brokerageWithdraw {
 	b.Updater = field.NewString(table, "updater")
 	b.CreatedAt = field.NewTime(table, "create_time")
 	b.UpdatedAt = field.NewTime(table, "update_time")
-	b.DeletedAt = field.NewField(table, "deleted_time")
+	b.DeletedAt = field.NewField(table, "deleted")
 	b.Deleted = field.NewBool(table, "deleted")
 
 	b.fillFieldMap()
@@ -181,7 +181,7 @@ func (b *brokerageWithdraw) fillFieldMap() {
 	b.fieldMap["updater"] = b.Updater
 	b.fieldMap["create_time"] = b.CreatedAt
 	b.fieldMap["update_time"] = b.UpdatedAt
-	b.fieldMap["deleted_time"] = b.DeletedAt
+	b.fieldMap["deleted"] = b.DeletedAt
 	b.fieldMap["deleted"] = b.Deleted
 }
 
