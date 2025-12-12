@@ -1,14 +1,21 @@
 package area
 
 import (
+	"bytes"
+	_ "embed"
 	"encoding/csv"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
 
 	"go.uber.org/zap"
 )
+
+//go:embed data/area.csv
+var areaCSV []byte
+
+//go:embed data/ip2region.xdb
+var IP2RegionXDB []byte
 
 // Area 地区节点
 type Area struct {
@@ -39,23 +46,17 @@ var (
 	initErr  error
 )
 
-// Init 初始化地区数据
-func Init(csvPath string) error {
+// Init 初始化地区数据（使用嵌入的 CSV 数据）
+func Init(_ string) error {
 	areaOnce.Do(func() {
-		initErr = loadFromCSV(csvPath)
+		initErr = loadFromEmbeddedCSV()
 	})
 	return initErr
 }
 
-// loadFromCSV 从 CSV 文件加载地区数据
-func loadFromCSV(csvPath string) error {
-	file, err := os.Open(csvPath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
+// loadFromEmbeddedCSV 从嵌入的 CSV 数据加载地区
+func loadFromEmbeddedCSV() error {
+	reader := csv.NewReader(bytes.NewReader(areaCSV))
 	records, err := reader.ReadAll()
 	if err != nil {
 		return err
@@ -115,7 +116,7 @@ func loadFromCSV(csvPath string) error {
 		}
 	}
 
-	zap.L().Info("地区数据加载完成", zap.Int("count", len(areas)))
+	zap.L().Info("地区数据加载完成 (embedded)", zap.Int("count", len(areas)))
 	return nil
 }
 

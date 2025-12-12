@@ -25,12 +25,17 @@ var (
 // NewAreaHandler 创建地区处理器
 func NewAreaHandler() *AreaHandler {
 	ip2regionOnce.Do(func() {
-		dbPath := "configs/ip2region.xdb"
+		// 使用嵌入的 ip2region.xdb 数据
+		cBuff := area.IP2RegionXDB
+		if len(cBuff) == 0 {
+			zap.L().Warn("ip2region.xdb embedded data is empty")
+			return
+		}
 
-		// 从 xdb 文件加载 header 获取正确的 Version
-		header, err := xdb.LoadHeaderFromFile(dbPath)
+		// 从嵌入数据加载 header 获取正确的 Version
+		header, err := xdb.LoadHeaderFromBuff(cBuff)
 		if err != nil {
-			zap.L().Warn("Failed to load ip2region header", zap.Error(err))
+			zap.L().Warn("Failed to load ip2region header from embedded data", zap.Error(err))
 			return
 		}
 
@@ -40,20 +45,13 @@ func NewAreaHandler() *AreaHandler {
 			return
 		}
 
-		// 加载完整内容到内存
-		cBuff, err := xdb.LoadContentFromFile(dbPath)
-		if err != nil {
-			zap.L().Warn("Failed to load ip2region.xdb", zap.Error(err))
-			return
-		}
-
 		// 使用正确的 Version 创建 Searcher
 		ip2regionSearcher, err = xdb.NewWithBuffer(version, cBuff)
 		if err != nil {
 			zap.L().Warn("Failed to create ip2region searcher", zap.Error(err))
 			return
 		}
-		zap.L().Info("ip2region searcher initialized", zap.String("version", version.Name))
+		zap.L().Info("ip2region searcher initialized (embedded)", zap.String("version", version.Name))
 	})
 
 	return &AreaHandler{searcher: ip2regionSearcher}

@@ -22,3 +22,4 @@ tmp/
 config/*.local.yaml
 /.spec-workflow/
 /internal/repo/query/
+server
