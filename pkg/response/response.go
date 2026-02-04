@@ -66,3 +66,13 @@ func WritePage[T any](c *gin.Context, total int64, list []T) {
 		Total: total,
 	}))
 }
+
+// NormalizeIntPtr normalizes *int query parameter to handle empty string case
+// Gin binds "?status=" (empty string) to &0 instead of nil, causing unintended filtering
+// This function checks if the raw query param is empty and returns nil in that case
+func NormalizeIntPtr(c *gin.Context, paramName string, value *int) *int {
+	if value != nil && c.Query(paramName) == "" {
+		return nil
+	}
+	return value
+}

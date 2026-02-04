@@ -338,7 +338,7 @@ type Int64ListFromCSV = ListFromCSV[int64]
 // StringListFromCSV 处理逗号分隔的字符串列表
 type StringListFromCSV = ListFromCSV[string]
 
-// JsonDateTime 用于 JSON 序列化时保持 "2006-01-02 15:04:05" 格式
+// JsonDateTime 用于 JSON 序列化时输出毫秒时间戳（对齐 Java 的 TimestampLocalDateTimeSerializer）
 type JsonDateTime time.Time
 
 const jsonDateTimeLayout = "2006-01-02 15:04:05"
@@ -348,14 +348,22 @@ func (t JsonDateTime) MarshalJSON() ([]byte, error) {
 	if st.IsZero() {
 		return []byte("null"), nil
 	}
-	return []byte(fmt.Sprintf("\"%s\"", st.Format(jsonDateTimeLayout))), nil
+	// 对齐 Java: 输出毫秒时间戳
+	return []byte(fmt.Sprintf("%d", st.UnixMilli())), nil
 }
 
 func (t *JsonDateTime) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
 		return nil
 	}
-	now, err := time.ParseInLocation("\""+jsonDateTimeLayout+"\"", string(data), time.Local)
+	s := string(data)
+	// 尝试解析毫秒时间戳
+	if ms, err := strconv.ParseInt(s, 10, 64); err == nil {
+		*t = JsonDateTime(time.UnixMilli(ms))
+		return nil
+	}
+	// 兼容旧的字符串格式
+	now, err := time.ParseInLocation("\""+jsonDateTimeLayout+"\"", s, time.Local)
 	*t = JsonDateTime(now)
 	return err
 }
