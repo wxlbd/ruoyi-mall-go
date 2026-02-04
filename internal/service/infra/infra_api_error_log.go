@@ -82,3 +82,40 @@ func (s *ApiErrorLogService) UpdateApiErrorLogProcess(ctx context.Context, id in
 	})
 	return err
 }
+
+// CleanErrorLog 物理删除 N 天前的错误日志
+// 对齐 Java: ApiErrorLogServiceImpl#cleanErrorLog
+func (s *ApiErrorLogService) CleanErrorLog(ctx context.Context, exceedDay int, deleteLimit int) (int, error) {
+	if exceedDay <= 0 || deleteLimit <= 0 {
+		return 0, nil
+	}
+
+	expireTime := time.Now().AddDate(0, 0, -exceedDay)
+	count := 0
+	for i := 0; i < int(^uint16(0)); i++ {
+		logs, err := s.q.InfraApiErrorLog.WithContext(ctx).
+			Where(s.q.InfraApiErrorLog.CreateTime.Lt(expireTime)).
+			Order(s.q.InfraApiErrorLog.ID.Asc()).
+			Limit(deleteLimit).
+			Find()
+		if err != nil {
+			return count, err
+		}
+		if len(logs) == 0 {
+			break
+		}
+
+		ids := make([]int64, 0, len(logs))
+		for _, log := range logs {
+			ids = append(ids, log.ID)
+		}
+		if _, err = s.q.InfraApiErrorLog.WithContext(ctx).Where(s.q.InfraApiErrorLog.ID.In(ids...)).Delete(); err != nil {
+			return count, err
+		}
+		count += len(ids)
+		if len(ids) < deleteLimit {
+			break
+		}
+	}
+	return count, nil
+}

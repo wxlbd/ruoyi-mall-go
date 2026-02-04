@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"time"
 
 	"github.com/wxlbd/ruoyi-mall-go/internal/api/contract/admin/infra"
 	"github.com/wxlbd/ruoyi-mall-go/internal/model"
@@ -72,4 +73,41 @@ func (s *ApiAccessLogService) GetApiAccessLogPage(ctx context.Context, r *infra.
 		List:  list,
 		Total: total,
 	}, nil
+}
+
+// CleanAccessLog 物理删除 N 天前的访问日志
+// 对齐 Java: ApiAccessLogServiceImpl#cleanAccessLog
+func (s *ApiAccessLogService) CleanAccessLog(ctx context.Context, exceedDay int, deleteLimit int) (int, error) {
+	if exceedDay <= 0 || deleteLimit <= 0 {
+		return 0, nil
+	}
+
+	expireTime := time.Now().AddDate(0, 0, -exceedDay)
+	count := 0
+	for i := 0; i < int(^uint16(0)); i++ {
+		logs, err := s.q.InfraApiAccessLog.WithContext(ctx).
+			Where(s.q.InfraApiAccessLog.CreateTime.Lt(expireTime)).
+			Order(s.q.InfraApiAccessLog.ID.Asc()).
+			Limit(deleteLimit).
+			Find()
+		if err != nil {
+			return count, err
+		}
+		if len(logs) == 0 {
+			break
+		}
+
+		ids := make([]int64, 0, len(logs))
+		for _, log := range logs {
+			ids = append(ids, log.ID)
+		}
+		if _, err = s.q.InfraApiAccessLog.WithContext(ctx).Where(s.q.InfraApiAccessLog.ID.In(ids...)).Delete(); err != nil {
+			return count, err
+		}
+		count += len(ids)
+		if len(ids) < deleteLimit {
+			break
+		}
+	}
+	return count, nil
 }
