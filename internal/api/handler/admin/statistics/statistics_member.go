@@ -47,10 +47,11 @@ func (h *MemberStatisticsHandler) GetMemberSummary(c *gin.Context) {
 // GET /statistics/member/analyse
 func (h *MemberStatisticsHandler) GetMemberAnalyse(c *gin.Context) {
 	var reqVO member2.MemberAnalyseReqVO
-	if err := c.ShouldBindQuery(&reqVO); err != nil {
+	if err := c.ShouldBindQuery(&reqVO); err != nil && len(resolveTimesQuery(c, reqVO.Times)) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
 		return
 	}
+	reqVO.Times = resolveTimesQuery(c, reqVO.Times)
 
 	if len(reqVO.Times) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
@@ -163,10 +164,11 @@ func (h *MemberStatisticsHandler) GetUserCountComparison(c *gin.Context) {
 // GET /statistics/member/register-count-list
 func (h *MemberStatisticsHandler) GetMemberRegisterCountList(c *gin.Context) {
 	var reqVO member2.MemberAnalyseReqVO
-	if err := c.ShouldBindQuery(&reqVO); err != nil {
+	if err := c.ShouldBindQuery(&reqVO); err != nil && len(resolveTimesQuery(c, reqVO.Times)) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
 		return
 	}
+	reqVO.Times = resolveTimesQuery(c, reqVO.Times)
 
 	if len(reqVO.Times) != 2 {
 		response.WriteBizError(c, errors.ErrParam)

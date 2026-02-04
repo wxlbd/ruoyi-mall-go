@@ -84,10 +84,11 @@ func (h *TradeStatisticsHandler) GetTradeSummaryComparison(c *gin.Context) {
 // GET /statistics/trade/analyse
 func (h *TradeStatisticsHandler) GetTradeStatisticsAnalyse(c *gin.Context) {
 	var reqVO trade2.TradeStatisticsReqVO
-	if err := c.ShouldBindQuery(&reqVO); err != nil {
+	if err := c.ShouldBindQuery(&reqVO); err != nil && len(resolveTimesQuery(c, reqVO.Times)) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
 		return
 	}
+	reqVO.Times = resolveTimesQuery(c, reqVO.Times)
 
 	if len(reqVO.Times) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
@@ -107,10 +108,11 @@ func (h *TradeStatisticsHandler) GetTradeStatisticsAnalyse(c *gin.Context) {
 // GET /statistics/trade/list
 func (h *TradeStatisticsHandler) GetTradeStatisticsList(c *gin.Context) {
 	var reqVO trade2.TradeStatisticsReqVO
-	if err := c.ShouldBindQuery(&reqVO); err != nil {
+	if err := c.ShouldBindQuery(&reqVO); err != nil && len(resolveTimesQuery(c, reqVO.Times)) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
 		return
 	}
+	reqVO.Times = resolveTimesQuery(c, reqVO.Times)
 
 	if len(reqVO.Times) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
@@ -198,10 +200,11 @@ func (h *TradeStatisticsHandler) GetOrderCountTrendComparison(c *gin.Context) {
 // GET /statistics/trade/export-excel
 func (h *TradeStatisticsHandler) ExportTradeStatisticsExcel(c *gin.Context) {
 	var reqVO trade2.TradeStatisticsReqVO
-	if err := c.ShouldBindQuery(&reqVO); err != nil {
+	if err := c.ShouldBindQuery(&reqVO); err != nil && len(resolveTimesQuery(c, reqVO.Times)) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
 		return
 	}
+	reqVO.Times = resolveTimesQuery(c, reqVO.Times)
 
 	if len(reqVO.Times) != 2 {
 		response.WriteBizError(c, errors.ErrParam)
