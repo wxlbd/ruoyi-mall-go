@@ -29,6 +29,20 @@ func NewCouponService(q *query.Query, userService *member.MemberUserService) *Co
 	}
 }
 
+// ExpireCoupon 将已过期且未使用的优惠券更新为已过期状态
+// 对齐 Java: CouponServiceImpl#expireCoupon
+func (s *CouponService) ExpireCoupon(ctx context.Context) (int64, error) {
+	c := s.q.PromotionCoupon
+	result, err := c.WithContext(ctx).
+		Where(c.Status.Eq(consts.CouponStatusUnused)).
+		Where(c.ValidEndTime.Lte(time.Now())).
+		Update(c.Status, consts.CouponStatusExpired)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected, nil
+}
+
 // CreateCouponTemplate 创建优惠券模板 (Admin)
 func (s *CouponService) CreateCouponTemplate(ctx context.Context, req *promotion3.CouponTemplateCreateReq) (int64, error) {
 	t := &promotion.PromotionCouponTemplate{
