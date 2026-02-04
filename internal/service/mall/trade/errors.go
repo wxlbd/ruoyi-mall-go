@@ -116,6 +116,24 @@ const (
 	ErrorCodeCartUpdateError = 1004006002 // 更新购物车失败
 	ErrorCodeCartDeleteError = 1004006003 // 删除购物车失败
 	ErrorCodeCartCountError  = 1004006004 // 购物车数量错误
+
+	// ========== 分销相关错误码 (1011007xxx) ==========
+	// 对齐 Java: ErrorCodeConstants.BROKERAGE_* (1_011_007_xxx)
+
+	// 分销用户相关错误 (1011007000-1011007099)
+	ErrorCodeBrokerageUserNotExists            = 1011007000 // 分销用户不存在
+	ErrorCodeBrokerageUserFrozenPriceNotEnough = 1011007001 // 用户冻结佣金数量不足
+	ErrorCodeBrokerageBindSelf                 = 1011007002 // 不能绑定自己
+	ErrorCodeBrokerageBindUserNotEnabled       = 1011007003 // 绑定用户没有推广资格
+	ErrorCodeBrokerageBindConditionAdmin       = 1011007004 // 仅可在后台绑定推广员
+	ErrorCodeBrokerageBindModeRegister         = 1011007005 // 只有在注册时可以绑定
+	ErrorCodeBrokerageBindOverride             = 1011007006 // 已绑定了推广人
+	ErrorCodeBrokerageBindLoop                 = 1011007007 // 下级不能绑定自己的上级
+	ErrorCodeBrokerageUserLevelNotSupport      = 1011007008 // 目前只支持 level 小于等于 2
+	ErrorCodeBrokerageUserExists               = 1011007009 // 分销用户已存在
+
+	// 分销提现相关错误 (1011008000-1011008099)
+	ErrorCodeBrokerageWithdrawNotExists = 1011008000 // 佣金提现记录不存在
 )
 
 // 错误消息映射表 (对齐 Java 版本的错误消息)
@@ -205,6 +223,19 @@ var errorMessages = map[int]string{
 	ErrorCodeCartUpdateError: "更新购物车失败",
 	ErrorCodeCartDeleteError: "删除购物车失败",
 	ErrorCodeCartCountError:  "购物车数量错误",
+
+	// 分销相关错误消息
+	ErrorCodeBrokerageUserNotExists:            "分销用户不存在",
+	ErrorCodeBrokerageUserFrozenPriceNotEnough: "用户冻结佣金数量不足",
+	ErrorCodeBrokerageBindSelf:                 "不能绑定自己",
+	ErrorCodeBrokerageBindUserNotEnabled:       "绑定用户没有推广资格",
+	ErrorCodeBrokerageBindConditionAdmin:       "仅可在后台绑定推广员",
+	ErrorCodeBrokerageBindModeRegister:         "只有在注册时可以绑定",
+	ErrorCodeBrokerageBindOverride:             "已绑定了推广人",
+	ErrorCodeBrokerageBindLoop:                 "下级不能绑定自己的上级",
+	ErrorCodeBrokerageUserLevelNotSupport:      "目前只支持 level 小于等于 2",
+	ErrorCodeBrokerageUserExists:               "分销用户已存在",
+	ErrorCodeBrokerageWithdrawNotExists:        "佣金提现记录不存在",
 }
 
 // NewTradeError 创建交易模块业务错误
@@ -248,3 +279,24 @@ func ErrOrderRefundNotAllow() error   { return NewTradeError(ErrorCodeOrderRefun
 func ErrOrderNotPickUp() error        { return NewTradeError(ErrorCodeOrderNotPickUp) }
 func ErrOrderPickUpCodeError() error  { return NewTradeError(ErrorCodeOrderPickUpCodeError) }
 func ErrOrderAlreadyPickUp() error    { return NewTradeError(ErrorCodeOrderAlreadyPickUp) }
+
+// 分销相关错误
+func ErrBrokerageUserNotExists() error { return NewTradeError(ErrorCodeBrokerageUserNotExists) }
+func ErrBrokerageUserFrozenPriceNotEnough() error {
+	return NewTradeError(ErrorCodeBrokerageUserFrozenPriceNotEnough)
+}
+func ErrBrokerageBindSelf() error { return NewTradeError(ErrorCodeBrokerageBindSelf) }
+func ErrBrokerageBindUserNotEnabled() error {
+	return NewTradeError(ErrorCodeBrokerageBindUserNotEnabled)
+}
+func ErrBrokerageBindConditionAdmin() error {
+	return NewTradeError(ErrorCodeBrokerageBindConditionAdmin)
+}
+func ErrBrokerageBindModeRegister() error { return NewTradeError(ErrorCodeBrokerageBindModeRegister) }
+func ErrBrokerageBindOverride() error     { return NewTradeError(ErrorCodeBrokerageBindOverride) }
+func ErrBrokerageBindLoop() error         { return NewTradeError(ErrorCodeBrokerageBindLoop) }
+func ErrBrokerageUserLevelNotSupport() error {
+	return NewTradeError(ErrorCodeBrokerageUserLevelNotSupport)
+}
+func ErrBrokerageUserExists() error        { return NewTradeError(ErrorCodeBrokerageUserExists) }
+func ErrBrokerageWithdrawNotExists() error { return NewTradeError(ErrorCodeBrokerageWithdrawNotExists) }

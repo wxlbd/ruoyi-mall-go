@@ -50,8 +50,8 @@ func (h *BrokerageWithdrawHandler) RejectBrokerageWithdraw(c *gin.Context) {
 	}
 
 	// 20: AUDIT_FAIL
-	if err := h.withdrawSvc.AuditBrokerageWithdraw(c, r.ID, 20, r.AuditReason); err != nil {
-		response.WriteError(c, 500, err.Error())
+	if err := h.withdrawSvc.AuditBrokerageWithdraw(c, int64(r.ID), 20, r.AuditReason); err != nil {
+		response.WriteBizError(c, err)
 		return
 	}
 

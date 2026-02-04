@@ -39,7 +39,7 @@ func (h *BrokerageUserHandler) CreateBrokerageUser(c *gin.Context) {
 
 	id, err := h.svc.CreateBrokerageUser(c.Request.Context(), &r)
 	if err != nil {
-		response.WriteError(c, 500, err.Error())
+		response.WriteBizError(c, err)
 		return
 	}
 	response.WriteSuccess(c, id)
@@ -53,8 +53,8 @@ func (h *BrokerageUserHandler) UpdateBindUser(c *gin.Context) {
 		response.WriteError(c, 400, err.Error())
 		return
 	}
-	if err := h.svc.UpdateBrokerageUserId(c.Request.Context(), r.ID, r.BindUserID); err != nil {
-		response.WriteError(c, 500, err.Error())
+	if err := h.svc.UpdateBrokerageUserId(c.Request.Context(), int64(r.ID), int64(r.BindUserID)); err != nil {
+		response.WriteBizError(c, err)
 		return
 	}
 	response.WriteSuccess(c, true)
@@ -68,8 +68,8 @@ func (h *BrokerageUserHandler) ClearBindUser(c *gin.Context) {
 		response.WriteError(c, 400, err.Error())
 		return
 	}
-	if err := h.svc.UpdateBrokerageUserId(c.Request.Context(), r.ID, 0); err != nil {
-		response.WriteError(c, 500, err.Error())
+	if err := h.svc.UpdateBrokerageUserId(c.Request.Context(), int64(r.ID), 0); err != nil {
+		response.WriteBizError(c, err)
 		return
 	}
 	response.WriteSuccess(c, true)
@@ -83,8 +83,8 @@ func (h *BrokerageUserHandler) UpdateBrokerageEnabled(c *gin.Context) {
 		response.WriteError(c, 400, err.Error())
 		return
 	}
-	if err := h.svc.UpdateBrokerageUserEnabled(c.Request.Context(), r.ID, r.Enabled); err != nil {
-		response.WriteError(c, 500, err.Error())
+	if err := h.svc.UpdateBrokerageUserEnabled(c.Request.Context(), int64(r.ID), r.Enabled); err != nil {
+		response.WriteBizError(c, err)
 		return
 	}
 	response.WriteSuccess(c, true)

@@ -8,8 +8,8 @@ import (
 
 type AppBrokerageRecordPageReqVO struct {
 	pagination.PageParam
-	BizType    string   `form:"bizType"`      // 业务类型
-	Status     int      `form:"status"`       // 状态
+	BizType    *int     `form:"bizType"`      // 业务类型
+	Status     *int     `form:"status"`       // 状态
 	CreateTime []string `form:"createTime[]"` // 创建时间
 }
 

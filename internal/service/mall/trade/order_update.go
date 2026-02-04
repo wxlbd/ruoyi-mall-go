@@ -8,6 +8,7 @@ import (
 
 	"github.com/wxlbd/ruoyi-mall-go/internal/api/contract/admin/mall/product"
 	trade2 "github.com/wxlbd/ruoyi-mall-go/internal/api/contract/admin/mall/trade"
+	memberContract "github.com/wxlbd/ruoyi-mall-go/internal/api/contract/admin/member"
 	"github.com/wxlbd/ruoyi-mall-go/internal/api/contract/admin/pay"
 	"github.com/wxlbd/ruoyi-mall-go/internal/consts"
 	"github.com/wxlbd/ruoyi-mall-go/internal/model"
@@ -20,6 +21,11 @@ import (
 	"go.uber.org/zap"
 )
 
+type memberAddressService interface {
+	GetAddress(ctx context.Context, userId int64, id int64) (*memberContract.AppAddressResp, error)
+	GetDefaultAddress(ctx context.Context, userId int64) (*memberContract.AppAddressResp, error)
+}
+
 // TradeOrderUpdateService 订单更新服务
 // 使用责任链模式重构，内部使用订单处理器
 type TradeOrderUpdateService struct {
@@ -27,7 +33,7 @@ type TradeOrderUpdateService struct {
 	manager      *OrderHandlerManager
 	priceSvc     *TradePriceService
 	cartSvc      *CartService
-	addressSvc   *member.MemberAddressService
+	addressSvc   memberAddressService
 	paySvc       PayOrderServiceAPI
 	payRefundSvc PayRefundServiceAPI
 	payAppSvc    PayAppServiceAPI
@@ -740,7 +746,7 @@ func (s *TradeOrderUpdateService) buildTradeOrder(ctx context.Context, userId in
 	case consts.DeliveryTypeExpress:
 		// 快递配送
 		if createReq.AddressID != nil && *createReq.AddressID > 0 {
-			address, _ := s.addressSvc.GetAddress(ctx, *createReq.AddressID, userId)
+			address, _ := s.addressSvc.GetAddress(ctx, userId, *createReq.AddressID)
 			if address != nil {
 				order.ReceiverName = address.Name
 				order.ReceiverMobile = address.Mobile

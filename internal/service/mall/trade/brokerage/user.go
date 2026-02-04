@@ -2,7 +2,6 @@ package brokerage
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	trade2 "github.com/wxlbd/ruoyi-mall-go/internal/api/contract/admin/mall/trade"
@@ -143,23 +142,27 @@ func (s *BrokerageUserService) GetBrokerageUserPage(ctx context.Context, r *trad
 
 // CreateBrokerageUser 创建分销用户（Admin 手动创建）
 func (s *BrokerageUserService) CreateBrokerageUser(ctx context.Context, r *trade2.BrokerageUserCreateReq) (int64, error) {
+	// Convert FlexInt64 to int64
+	userID := int64(r.UserID)
+	bindUserID := int64(r.BindUserID)
+
 	// 1.1 校验分销用户是否已存在
-	exists, _ := s.GetBrokerageUser(ctx, r.UserID)
+	exists, _ := s.GetBrokerageUser(ctx, userID)
 	if exists != nil {
-		return 0, errors.New("分销用户已存在")
+		return 0, trade.ErrBrokerageUserExists()
 	}
 
 	// 1.2 校验是否能绑定用户
-	user := &brokerage.BrokerageUser{ID: r.UserID}
-	if err := s.validateCanBindUser(ctx, user, r.BindUserID); err != nil {
+	user := &brokerage.BrokerageUser{ID: userID}
+	if err := s.validateCanBindUser(ctx, user, bindUserID); err != nil {
 		return 0, err
 	}
 
 	// 2. 创建分销人
 	now := time.Now()
 	newUser := &brokerage.BrokerageUser{
-		ID:            r.UserID,
-		BindUserID:    r.BindUserID,
+		ID:            userID,
+		BindUserID:    bindUserID,
 		BindUserTime:  &now,
 		BrokerageTime: &now,
 	}
@@ -338,12 +341,12 @@ func (s *BrokerageUserService) isUserCanBind(ctx context.Context, user *brokerag
 			return false, nil
 		}
 		if time.Since(memberUser.CreateTime) > 30*time.Second {
-			return false, errors.New("只有在注册时可以绑定")
+			return false, trade.ErrBrokerageBindModeRegister()
 		}
 	case 3:
 		// 覆盖绑定模式：不允许
 		if user.BindUserID > 0 {
-			return false, errors.New("已绑定了推广人")
+			return false, trade.ErrBrokerageBindOverride()
 		}
 	}
 	// 首次绑定模式 (默认)：如果已绑定则返回 false
@@ -361,18 +364,18 @@ func (s *BrokerageUserService) validateCanBindUser(ctx context.Context, user *br
 	// 1.1 校验推广人是否存在
 	bindUser, err := s.memberSvc.GetUser(ctx, bindUserId)
 	if err != nil || bindUser == nil {
-		return errors.New("推广人不存在")
+		return trade.ErrBrokerageUserNotExists()
 	}
 
 	// 1.2 校验要绑定的用户有无推广资格
 	brokerageBindUser, _ := s.GetOrCreateBrokerageUser(ctx, bindUserId)
 	if brokerageBindUser == nil || !brokerageBindUser.BrokerageEnabled {
-		return errors.New("推广人无推广资格")
+		return trade.ErrBrokerageBindUserNotEnabled()
 	}
 
 	// 2. 校验绑定自己
 	if user.ID == bindUserId {
-		return errors.New("不能绑定自己")
+		return trade.ErrBrokerageBindSelf()
 	}
 
 	// 3. 下级不能绑定自己的上级（循环绑定检查）
@@ -382,7 +385,7 @@ func (s *BrokerageUserService) validateCanBindUser(ctx context.Context, user *br
 			break
 		}
 		if currentBindId == user.ID {
-			return errors.New("不能循环绑定")
+			return trade.ErrBrokerageBindLoop()
 		}
 		next, _ := s.GetBrokerageUser(ctx, currentBindId)
 		if err != nil || next == nil {

@@ -47,6 +47,8 @@ type TradeOrderBase struct {
 	RefundPrice           int        `json:"refundPrice"`
 	CouponID              int64      `json:"couponId"`
 	CouponPrice           int        `json:"couponPrice"`
+	PointPrice            int        `json:"pointPrice"`
+	VipPrice              int        `json:"vipPrice"`
 }
 
 // TradeOrderItemBase 订单项基础响应

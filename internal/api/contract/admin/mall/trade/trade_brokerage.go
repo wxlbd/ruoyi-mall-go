@@ -3,30 +3,31 @@ package trade
 import (
 	"time"
 
+	"github.com/wxlbd/ruoyi-mall-go/internal/model"
 	"github.com/wxlbd/ruoyi-mall-go/pkg/pagination"
 )
 
 // BrokerageUserCreateReq 创建分销用户 Request
 type BrokerageUserCreateReq struct {
-	UserID     int64 `json:"userId" binding:"required"`
-	BindUserID int64 `json:"bindUserId"`
+	UserID     model.FlexInt64 `json:"userId" binding:"required"`
+	BindUserID model.FlexInt64 `json:"bindUserId"`
 }
 
 // BrokerageUserUpdateBindUserReq 修改推广员 Request
 type BrokerageUserUpdateBindUserReq struct {
-	ID         int64 `json:"id" binding:"required"`
-	BindUserID int64 `json:"bindUserId" binding:"required"`
+	ID         model.FlexInt64 `json:"id" binding:"required"`
+	BindUserID model.FlexInt64 `json:"bindUserId" binding:"required"`
 }
 
 // BrokerageUserClearBindUserReq 清除推广员 Request
 type BrokerageUserClearBindUserReq struct {
-	ID int64 `json:"id" binding:"required"`
+	ID model.FlexInt64 `json:"id" binding:"required"`
 }
 
 // BrokerageUserUpdateBrokerageEnabledReq 修改推广资格 Request
 type BrokerageUserUpdateBrokerageEnabledReq struct {
-	ID      int64 `json:"id" binding:"required"`
-	Enabled bool  `json:"enabled"`
+	ID      model.FlexInt64 `json:"id" binding:"required"`
+	Enabled bool            `json:"enabled"`
 }
 
 // BrokerageUserPageReq 分销用户分页 Request
@@ -42,11 +43,12 @@ type BrokerageUserPageReq struct {
 // BrokerageRecordPageReq 分销记录分页 Request
 type BrokerageRecordPageReq struct {
 	pagination.PageParam
-	UserID     int64    `form:"userId"`
-	BizType    string   `form:"bizType"` // 业务类型: order, withdraw
-	Status     int      `form:"status"`
-	CreateTime []string `form:"createTime[]"` // Range
-	BizID      string   `form:"bizId"`
+	UserID          *int64   `form:"userId"`          // 用户编号（改为指针类型）
+	BizType         *int     `form:"bizType"`         // 业务类型
+	Status          *int     `form:"status"`          // 状态
+	CreateTime      []string `form:"createTime[]"`    // Range
+	SourceUserLevel *int     `form:"sourceUserLevel"` // 来源用户等级
+	BizID           string   `form:"bizId"`           // 业务编号
 }
 
 // BrokerageWithdrawPageReq 分销提现分页 Request
@@ -63,8 +65,8 @@ type BrokerageWithdrawPageReq struct {
 
 // BrokerageWithdrawRejectReq 分销提现驳回 Request
 type BrokerageWithdrawRejectReq struct {
-	ID          int64  `json:"id" binding:"required"`
-	AuditReason string `json:"auditReason" binding:"required"`
+	ID          model.FlexInt64 `json:"id" binding:"required"`
+	AuditReason string          `json:"auditReason" binding:"required"`
 }
 
 // AppBrokerageUserRankPageReq 分销用户排行分页 Request (App)

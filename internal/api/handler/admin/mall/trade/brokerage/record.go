@@ -70,6 +70,7 @@ func (h *BrokerageRecordHandler) GetBrokerageRecordPage(c *gin.Context) {
 		response.WriteError(c, 400, "参数错误")
 		return
 	}
+	r.CreateTime = resolveCreateTimeQuery(c, r.CreateTime)
 
 	pageResult, err := h.recordSvc.GetBrokerageRecordPage(c, &r)
 	if err != nil {
@@ -121,4 +122,15 @@ func (h *BrokerageRecordHandler) GetBrokerageRecordPage(c *gin.Context) {
 		List:  list,
 		Total: pageResult.Total,
 	})
+}
+
+func resolveCreateTimeQuery(c *gin.Context, createTime []string) []string {
+	if len(createTime) == 2 {
+		return createTime
+	}
+	createTime = c.QueryArray("createTime")
+	if len(createTime) == 2 {
+		return createTime
+	}
+	return c.QueryArray("createTime[]")
 }

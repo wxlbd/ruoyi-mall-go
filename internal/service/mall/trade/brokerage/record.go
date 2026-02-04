@@ -3,6 +3,7 @@ package brokerage
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	trade2 "github.com/wxlbd/ruoyi-mall-go/internal/api/contract/admin/mall/trade"
@@ -66,24 +67,23 @@ func (s *BrokerageRecordService) GetBrokerageRecord(ctx context.Context, id int6
 func (s *BrokerageRecordService) GetBrokerageRecordPage(ctx context.Context, r *trade2.BrokerageRecordPageReq) (*pagination.PageResult[*brokerage.BrokerageRecord], error) {
 	q := s.q.BrokerageRecord.WithContext(ctx)
 
-	if r.UserID > 0 {
-		q = q.Where(s.q.BrokerageRecord.UserID.Eq(r.UserID))
+	if r.UserID != nil && *r.UserID > 0 {
+		q = q.Where(s.q.BrokerageRecord.UserID.Eq(*r.UserID))
 	}
-	// BizType 过滤: 请求传入字符串，需要映射为整数
-	if r.BizType != "" {
-		bizTypeInt := s.mapBizTypeToInt(r.BizType)
-		if bizTypeInt > 0 {
-			q = q.Where(s.q.BrokerageRecord.BizType.Eq(bizTypeInt))
-		}
+	if r.BizType != nil {
+		q = q.Where(s.q.BrokerageRecord.BizType.Eq(*r.BizType))
 	}
-	if r.Status > 0 {
-		q = q.Where(s.q.BrokerageRecord.Status.Eq(r.Status))
+	if r.Status != nil {
+		q = q.Where(s.q.BrokerageRecord.Status.Eq(*r.Status))
+	}
+	if r.SourceUserLevel != nil {
+		q = q.Where(s.q.BrokerageRecord.SourceUserLevel.Eq(*r.SourceUserLevel))
 	}
 	if r.BizID != "" {
 		q = q.Where(s.q.BrokerageRecord.BizID.Eq(r.BizID))
 	}
-	if len(r.CreateTime) == 2 {
-		q = q.Where(s.q.BrokerageRecord.CreateTime.Between(parseTime(r.CreateTime[0]), parseTime(r.CreateTime[1])))
+	if begin, end, ok := parseTimeRange(r.CreateTime); ok {
+		q = q.Where(s.q.BrokerageRecord.CreateTime.Between(begin, end))
 	}
 
 	total, err := q.Count()
@@ -105,16 +105,31 @@ func (s *BrokerageRecordService) GetBrokerageRecordPage(ctx context.Context, r *
 
 // mapBizTypeToInt 将业务类型字符串映射为整数
 func (s *BrokerageRecordService) mapBizTypeToInt(bizType string) int {
-	switch bizType {
-	case "order":
+	switch strings.TrimSpace(bizType) {
+	case "1", "order":
 		return tradeModel.BrokerageRecordBizTypeOrder
-	case "withdraw":
+	case "2", "withdraw":
 		return tradeModel.BrokerageRecordBizTypeWithdraw
-	case "withdraw_reject":
+	case "3", "withdraw_reject":
 		return tradeModel.BrokerageRecordBizTypeWithdrawReject
 	default:
 		return 0
 	}
+}
+
+func parseTimeRange(values []string) (time.Time, time.Time, bool) {
+	if len(values) != 2 {
+		return time.Time{}, time.Time{}, false
+	}
+	begin, err := time.ParseInLocation(time.DateTime, strings.TrimSpace(values[0]), time.Local)
+	if err != nil {
+		return time.Time{}, time.Time{}, false
+	}
+	end, err := time.ParseInLocation(time.DateTime, strings.TrimSpace(values[1]), time.Local)
+	if err != nil {
+		return time.Time{}, time.Time{}, false
+	}
+	return begin, end, true
 }
 
 // AddBrokerage 添加分销记录（增加佣金）

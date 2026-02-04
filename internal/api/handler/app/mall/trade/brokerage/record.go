@@ -30,23 +30,15 @@ func (h *AppBrokerageRecordHandler) GetBrokerageRecordPage(c *gin.Context) {
 		response.WriteError(c, 400, "参数错误")
 		return
 	}
+	reqVO.CreateTime = resolveCreateTimeQuery(c, reqVO.CreateTime)
 
 	userId := context.GetLoginUserID(c)
 	pageReq := &trade.BrokerageRecordPageReq{
 		PageParam:  reqVO.PageParam,
-		UserID:     userId,
+		UserID:     &userId,
 		Status:     reqVO.Status,
 		CreateTime: reqVO.CreateTime,
-		// BizType:    reqVO.BizType, // BizType mismatch: Model int vs Req string?
-		// Service expects request struct.
-		// Admin Req has BizType string/int?
-		// Checking BrokerageRecordService.GetBrokerageRecordPage(..., r *req.BrokerageRecordPageReq)
-		// Let's assume we map explicitly if needed.
-		// If reqVO.BizType is string, and Admin req has BizType string, it matches.
-		// If Admin req has BizType as string but logic uses it as enum value (1,2) or "order" string.
-		// Java: App passes "bizType" (string or int?), Service uses string in Admin DTO?
-		// Let's assume string for now based on previous file views.
-		BizType: reqVO.BizType,
+		BizType:    reqVO.BizType,
 	}
 
 	pageResult, err := h.recordSvc.GetBrokerageRecordPage(c, pageReq)
@@ -92,4 +84,15 @@ func (h *AppBrokerageRecordHandler) GetProductBrokeragePrice(c *gin.Context) {
 		return
 	}
 	response.WriteSuccess(c, result)
+}
+
+func resolveCreateTimeQuery(c *gin.Context, createTime []string) []string {
+	if len(createTime) == 2 {
+		return createTime
+	}
+	createTime = c.QueryArray("createTime")
+	if len(createTime) == 2 {
+		return createTime
+	}
+	return c.QueryArray("createTime[]")
 }
