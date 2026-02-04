@@ -32,6 +32,13 @@ func NewProductSpuService(q *query.Query, skuSvc *ProductSkuService, brandSvc *P
 	return s
 }
 
+func mergeVirtualSalesCount(spu *product.ProductSpu) {
+	if spu == nil {
+		return
+	}
+	spu.SalesCount += spu.VirtualSalesCount
+}
+
 // CreateSpu 创建 SPU
 func (s *ProductSpuService) CreateSpu(ctx context.Context, req *product2.ProductSpuSaveReq) (int64, error) {
 	// 校验分类
@@ -195,7 +202,7 @@ func (s *ProductSpuService) GetSpuDetail(ctx context.Context, id int64) (*produc
 	}
 
 	// 合并销量：实际销量 + 虚拟销量，对齐Java版本逻辑
-	spu.SalesCount = spu.SalesCount + spu.VirtualSalesCount
+	mergeVirtualSalesCount(spu)
 
 	return spu, skus, nil
 }
@@ -309,6 +316,9 @@ func (s *ProductSpuService) GetSpuPageForApp(ctx context.Context, req *product3.
 	if err != nil {
 		return nil, err
 	}
+	for _, spu := range list {
+		mergeVirtualSalesCount(spu)
+	}
 	return &pagination.PageResult[*product.ProductSpu]{
 		List:  list,
 		Total: total,
@@ -338,7 +348,7 @@ func (s *ProductSpuService) GetSpuList(ctx context.Context, ids []int64) ([]*pro
 	for _, id := range ids {
 		if spu, exists := spuMap[id]; exists {
 			// 合并销量：实际销量 + 虚拟销量，对齐Java版本逻辑
-			spu.SalesCount = spu.SalesCount + spu.VirtualSalesCount
+			mergeVirtualSalesCount(spu)
 			result = append(result, s.convertResp(spu, nil))
 		}
 	}

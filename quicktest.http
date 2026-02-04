@@ -2,3 +2,21 @@
 DELETE http://localhost:48080/admin-api/system/dict-type/delete?id=123
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0NSwidXNlclR5cGUiOjIsInRlbmFudElkIjoxLCJuaWNrbmFtZSI6Iua1i-ivlWNhc2JpbiIsImlzcyI6Inl1ZGFvLWdvIiwiZXhwIjoxNzY4Mzk4NDQyLCJpYXQiOjE3NjU4MDY0NDJ9.rLh7700S4yi22MQG_D13mwhj7BA_2Y7fwVmTStn49q4
+
+
+
+###
+PUT http://127.0.0.1:48080/admin-api/product/brand/update
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJUeXBlIjoyLCJ0ZW5hbnRJZCI6MSwibmlja25hbWUiOiLmi77niankvJjpgIkiLCJpc3MiOiJ5dWRhby1nbyIsImV4cCI6MTc3MjI2Mzk4MiwiaWF0IjoxNzY5NjcxOTgyfQ.koEG8LKV_38vRYf7m5iNBUMW9W2sYRh1wyX7bsPDzLw
+
+
+{
+  "id": 6,
+  "name": "棉小润",
+  "picUrl": "http://192.168.0.75/admin-api/infra/file/29/get/2026/01/27/6e09a52a92e86672217b1c719bf427521eb0b25344633-1W7qhu_1769503812605958092.png",
+  "sort": 1,
+  "description": "",
+  "status": 0,
+  "createTime": "2026-01-23T07:18:05Z"
+}

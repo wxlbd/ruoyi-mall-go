@@ -48,16 +48,14 @@ func (s *ProductBrandService) UpdateBrand(ctx context.Context, req *product2.Pro
 	if err := s.validateBrandNameUnique(ctx, req.ID, req.Name); err != nil {
 		return err
 	}
-	b := s.q.ProductBrand
 	_, err := s.q.ProductBrand.WithContext(ctx).
 		Where(s.q.ProductBrand.ID.Eq(req.ID)).
-		Select(b.Name, b.PicURL, b.Sort, b.Description, b.Status).
-		Updates(&product.ProductBrand{
-			Name:        req.Name,
-			PicURL:      req.PicURL,
-			Sort:        req.Sort,
-			Description: req.Description,
-			Status:      req.Status,
+		UpdateColumns(map[string]any{
+			"name":        req.Name,
+			"pic_url":     req.PicURL,
+			"sort":        req.Sort,
+			"description": req.Description,
+			"status":      req.Status,
 		})
 	return err
 }
@@ -139,7 +137,7 @@ func (s *ProductBrandService) ValidateProductBrand(ctx context.Context, id int64
 // validateBrandNameUnique 校验品牌名称是否唯一
 func (s *ProductBrandService) validateBrandNameUnique(ctx context.Context, id int64, name string) error {
 	u := s.q.ProductBrand
-	brand, err := u.WithContext(ctx).Where(u.Name.Eq(name)).First()
+	brand, err := u.WithContext(ctx).Where(u.Name.Eq(name), u.ID.Neq(id)).First()
 	if err == nil && brand != nil {
 		if id == 0 || brand.ID != id {
 			return errors.NewBizError(1006001001, "品牌名称已存在") // BRAND_NAME_EXISTS
