@@ -41,13 +41,16 @@ import (
 	product3 "github.com/wxlbd/ruoyi-mall-go/internal/repo/product"
 	trade2 "github.com/wxlbd/ruoyi-mall-go/internal/repo/trade"
 	infra2 "github.com/wxlbd/ruoyi-mall-go/internal/service/infra"
+	job3 "github.com/wxlbd/ruoyi-mall-go/internal/service/infra/job"
 	iot2 "github.com/wxlbd/ruoyi-mall-go/internal/service/iot"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/mall/product"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/mall/promotion"
+	job2 "github.com/wxlbd/ruoyi-mall-go/internal/service/mall/promotion/job"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade/brokerage"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade/calculators"
 	client2 "github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade/delivery/client"
+	job4 "github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade/job"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/member"
 	pay2 "github.com/wxlbd/ruoyi-mall-go/internal/service/pay"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/pay/client"
@@ -95,14 +98,68 @@ func InitApp() (*gin.Engine, error) {
 	payOrderExpireJob := job.NewPayOrderExpireJob(payOrderService)
 	payRefundService := pay2.NewPayRefundService(query, payAppService, payChannelService, payOrderService, payNotifyService, payNoRedisDAO)
 	payRefundSyncJob := job.NewPayRefundSyncJob(payRefundService)
-	v := ProvideJobHandlers(payTransferSyncJob, payNotifyJob, payOrderSyncJob, payOrderExpireJob, payRefundSyncJob)
-	scheduler, err := infra2.NewScheduler(query, zapLogger, v)
+	smsTemplateService := system.NewSmsTemplateService(query)
+	smsLogService := system.NewSmsLogService(query)
+	smsClientFactory := system.NewSmsClientFactory()
+	smsSendService := system.NewSmsSendService(query, smsTemplateService, smsLogService, smsClientFactory)
+	smsCodeService := system.NewSmsCodeService(query, redisClient, smsSendService)
+	memberLevelService := member.NewMemberLevelService(query)
+	socialUserService := system.NewSocialUserService(query)
+	memberUserService := member.NewMemberUserService(query, smsCodeService, memberLevelService, socialUserService)
+	couponService := promotion.NewCouponService(query, memberUserService)
+	couponExpireJob := job2.NewCouponExpireJob(couponService)
+	jobLogService := infra2.NewJobLogService(query)
+	jobLogCleanJob := job3.NewJobLogCleanJob(jobLogService)
+	errorLogCleanJob := job3.NewErrorLogCleanJob(apiErrorLogService)
+	accessLogCleanJob := job3.NewAccessLogCleanJob(apiAccessLogService)
+	defaultPromotionPriceCalculator := trade.NewDefaultPromotionPriceCalculator(query)
+	priceCalculatorHelper := trade.NewPriceCalculatorHelper(zapLogger)
+	bargainActivityPriceCalculator := calculators.NewBargainActivityPriceCalculator(defaultPromotionPriceCalculator, priceCalculatorHelper, zapLogger)
+	combinationActivityPriceCalculator := calculators.NewCombinationActivityPriceCalculator(defaultPromotionPriceCalculator, priceCalculatorHelper, zapLogger)
+	couponUserService := promotion.NewCouponUserService(query)
+	couponPriceCalculator := calculators.NewCouponPriceCalculator(couponUserService, priceCalculatorHelper, zapLogger)
+	deliveryExpressTemplateService := trade.NewDeliveryExpressTemplateService(query)
+	memberAddressService := member.NewMemberAddressService(query)
+	productPropertyValueService := product.NewProductPropertyValueService(query)
+	productPropertyService := product.NewProductPropertyService(query, productPropertyValueService)
+	productSkuService := product.NewProductSkuService(query, productPropertyService, productPropertyValueService)
+	productBrandService := product.NewProductBrandService(query)
+	productCategoryService := product.NewProductCategoryService(query)
+	productSpuService := product.NewProductSpuService(query, productSkuService, productBrandService, productCategoryService)
+	deliveryPriceCalculator := calculators.NewDeliveryPriceCalculator(deliveryExpressTemplateService, memberAddressService, productSpuService, priceCalculatorHelper, zapLogger)
+	discountActivityService := promotion.NewDiscountActivityService(query, productSkuService)
+	discountActivityPriceCalculator := calculators.NewDiscountActivityPriceCalculator(discountActivityService, memberUserService, memberLevelService, priceCalculatorHelper, zapLogger)
+	pointActivityPriceCalculator := calculators.NewPointActivityPriceCalculator(defaultPromotionPriceCalculator, priceCalculatorHelper, zapLogger)
+	memberConfigService := member.NewMemberConfigService(query)
+	pointGivePriceCalculator := calculators.NewPointGivePriceCalculator(memberConfigService, priceCalculatorHelper, zapLogger)
+	pointUsePriceCalculator := calculators.NewPointUsePriceCalculator(memberConfigService, memberUserService, priceCalculatorHelper, zapLogger)
+	rewardActivityService := promotion.NewRewardActivityService(query)
+	rewardActivityPriceCalculator := calculators.NewRewardActivityPriceCalculator(rewardActivityService, priceCalculatorHelper, zapLogger)
+	seckillConfigService := promotion.NewSeckillConfigService(query)
+	seckillActivityService := promotion.NewSeckillActivityService(query, seckillConfigService, productSpuService, productSkuService)
+	seckillActivityPriceCalculator := calculators.NewSeckillActivityPriceCalculator(seckillActivityService, priceCalculatorHelper, zapLogger)
+	v := ProvidePriceCalculators(bargainActivityPriceCalculator, combinationActivityPriceCalculator, couponPriceCalculator, deliveryPriceCalculator, discountActivityPriceCalculator, pointActivityPriceCalculator, pointGivePriceCalculator, pointUsePriceCalculator, rewardActivityPriceCalculator, seckillActivityPriceCalculator)
+	tradePriceService := trade.NewTradePriceService(v, priceCalculatorHelper, productSkuService, productSpuService, rewardActivityService, discountActivityPriceCalculator, discountActivityService, memberUserService, memberLevelService, zapLogger)
+	cartService := trade.NewCartService(query, productSkuService, productSpuService)
+	tradeConfigService := trade.NewTradeConfigService(query)
+	productCommentService := product.NewProductCommentService(query, productSpuService, productSkuService)
+	tradeOrderLogRepository := repo.NewTradeOrderLogRepository(query)
+	tradeOrderLogService := trade.NewTradeOrderLogService(tradeOrderLogRepository)
+	tradeNoRedisDAO := trade2.NewTradeNoRedisDAO(redisClient)
+	tradeOrderUpdateService := trade.NewTradeOrderUpdateService(query, tradePriceService, cartService, memberAddressService, payOrderService, payRefundService, payAppService, tradeConfigService, productSkuService, productCommentService, couponUserService, memberUserService, tradeOrderLogService, tradeNoRedisDAO, zapLogger)
+	tradeOrderAutoCancelJob := job4.NewTradeOrderAutoCancelJob(tradeOrderUpdateService)
+	tradeOrderAutoReceiveJob := job4.NewTradeOrderAutoReceiveJob(tradeOrderUpdateService)
+	tradeOrderAutoCommentJob := job4.NewTradeOrderAutoCommentJob(tradeOrderUpdateService)
+	brokerageRecordService := brokerage.NewBrokerageRecordService(query, zapLogger, tradeConfigService, productSpuService, productSkuService)
+	brokerageUserService := brokerage.NewBrokerageUserService(query, zapLogger, memberUserService, tradeConfigService)
+	brokerageRecordUnfreezeJob := job4.NewBrokerageRecordUnfreezeJob(brokerageRecordService, brokerageUserService)
+	v2 := ProvideJobHandlers(payTransferSyncJob, payNotifyJob, payOrderSyncJob, payOrderExpireJob, payRefundSyncJob, couponExpireJob, jobLogCleanJob, errorLogCleanJob, accessLogCleanJob, tradeOrderAutoCancelJob, tradeOrderAutoReceiveJob, tradeOrderAutoCommentJob, brokerageRecordUnfreezeJob)
+	scheduler, err := infra2.NewScheduler(query, zapLogger, v2)
 	if err != nil {
 		return nil, err
 	}
 	jobService := infra2.NewJobService(query, scheduler)
 	jobHandler := infra.NewJobHandler(jobService)
-	jobLogService := infra2.NewJobLogService(query)
 	jobLogHandler := infra.NewJobLogHandler(jobLogService)
 	manager := websocket.NewManager()
 	webSocketHandler := infra.NewWebSocketHandler(manager, zapLogger)
@@ -111,8 +168,8 @@ func InitApp() (*gin.Engine, error) {
 	deviceRepository := iot.NewDeviceRepository(query)
 	productService := iot2.NewProductService(productRepository, deviceRepository)
 	productCategoryRepository := iot.NewProductCategoryRepository(query)
-	productCategoryService := iot2.NewProductCategoryService(productCategoryRepository)
-	productHandler := iot3.NewProductHandler(productService, productCategoryService)
+	iotProductCategoryService := iot2.NewProductCategoryService(productCategoryRepository)
+	productHandler := iot3.NewProductHandler(productService, iotProductCategoryService)
 	deviceAuthUtils := core.NewDeviceAuthUtils()
 	deviceService := iot2.NewDeviceService(productRepository, deviceRepository, deviceAuthUtils)
 	deviceHandler := iot3.NewDeviceHandler(deviceService)
@@ -144,7 +201,7 @@ func InitApp() (*gin.Engine, error) {
 	sceneRuleRepository := iot.NewSceneRuleRepository(query)
 	sceneRuleService := iot2.NewSceneRuleService(sceneRuleRepository)
 	sceneRuleHandler := iot3.NewSceneRuleHandler(sceneRuleService)
-	productCategoryHandler := iot3.NewProductCategoryHandler(productCategoryService)
+	productCategoryHandler := iot3.NewProductCategoryHandler(iotProductCategoryService)
 	deviceMessageRepository := iot.NewDeviceMessageRepository(query)
 	statisticsService := iot2.NewStatisticsService(productCategoryRepository, productRepository, deviceRepository, deviceMessageRepository)
 	statisticsHandler := iot3.NewStatisticsHandler(statisticsService)
@@ -156,17 +213,10 @@ func InitApp() (*gin.Engine, error) {
 	deviceMessageHandler := iot3.NewDeviceMessageHandler(deviceMessageService)
 	devicePropertyHandler := iot3.NewDevicePropertyHandler(devicePropertyService, deviceService, thingModelService)
 	iotHandlers := iot3.NewHandlers(productHandler, deviceHandler, thingModelHandler, deviceGroupHandler, otaFirmwareHandler, otaTaskHandler, alertConfigHandler, alertRecordHandler, dataSinkHandler, dataRuleHandler, sceneRuleHandler, productCategoryHandler, statisticsHandler, deviceMessageHandler, devicePropertyHandler)
-	productBrandService := product.NewProductBrandService(query)
 	productBrandHandler := product2.NewProductBrandHandler(productBrandService)
-	productPropertyValueService := product.NewProductPropertyValueService(query)
-	productPropertyService := product.NewProductPropertyService(query, productPropertyValueService)
-	productSkuService := product.NewProductSkuService(query, productPropertyService, productPropertyValueService)
-	productProductCategoryService := product.NewProductCategoryService(query)
-	productSpuService := product.NewProductSpuService(query, productSkuService, productBrandService, productProductCategoryService)
 	productBrowseHistoryService := product.NewProductBrowseHistoryService(query, productSpuService)
 	productBrowseHistoryHandler := product2.NewProductBrowseHistoryHandler(productBrowseHistoryService)
-	productProductCategoryHandler := product2.NewProductCategoryHandler(productProductCategoryService)
-	productCommentService := product.NewProductCommentService(query, productSpuService, productSkuService)
+	productProductCategoryHandler := product2.NewProductCategoryHandler(productCategoryService)
 	productCommentHandler := product2.NewProductCommentHandler(productCommentService)
 	productFavoriteService := product.NewProductFavoriteService(query, productSpuService)
 	productFavoriteHandler := product2.NewProductFavoriteHandler(productFavoriteService)
@@ -183,50 +233,13 @@ func InitApp() (*gin.Engine, error) {
 	bargainRecordService := promotion.NewBargainRecordService(query)
 	bargainHelpService := promotion.NewBargainHelpService(query)
 	bargainActivityHandler := promotion2.NewBargainActivityHandler(bargainActivityService, bargainRecordService, bargainHelpService, productSpuService)
-	smsTemplateService := system.NewSmsTemplateService(query)
-	smsLogService := system.NewSmsLogService(query)
-	smsClientFactory := system.NewSmsClientFactory()
-	smsSendService := system.NewSmsSendService(query, smsTemplateService, smsLogService, smsClientFactory)
-	smsCodeService := system.NewSmsCodeService(query, redisClient, smsSendService)
-	memberLevelService := member.NewMemberLevelService(query)
-	socialUserService := system.NewSocialUserService(query)
-	memberUserService := member.NewMemberUserService(query, smsCodeService, memberLevelService, socialUserService)
 	bargainHelpHandler := promotion2.NewBargainHelpHandler(bargainHelpService, memberUserService)
 	bargainRecordHandler := promotion2.NewBargainRecordHandler(bargainRecordService, bargainActivityService, memberUserService)
 	combinationActivityService := promotion.NewCombinationActivityService(query, productSpuService, productSkuService)
-	defaultPromotionPriceCalculator := trade.NewDefaultPromotionPriceCalculator(query)
-	priceCalculatorHelper := trade.NewPriceCalculatorHelper(zapLogger)
-	bargainActivityPriceCalculator := calculators.NewBargainActivityPriceCalculator(defaultPromotionPriceCalculator, priceCalculatorHelper, zapLogger)
-	combinationActivityPriceCalculator := calculators.NewCombinationActivityPriceCalculator(defaultPromotionPriceCalculator, priceCalculatorHelper, zapLogger)
-	couponUserService := promotion.NewCouponUserService(query)
-	couponPriceCalculator := calculators.NewCouponPriceCalculator(couponUserService, priceCalculatorHelper, zapLogger)
-	deliveryExpressTemplateService := trade.NewDeliveryExpressTemplateService(query)
-	memberAddressService := member.NewMemberAddressService(query)
-	deliveryPriceCalculator := calculators.NewDeliveryPriceCalculator(deliveryExpressTemplateService, memberAddressService, productSpuService, priceCalculatorHelper, zapLogger)
-	discountActivityService := promotion.NewDiscountActivityService(query, productSkuService)
-	discountActivityPriceCalculator := calculators.NewDiscountActivityPriceCalculator(discountActivityService, memberUserService, memberLevelService, priceCalculatorHelper, zapLogger)
-	pointActivityPriceCalculator := calculators.NewPointActivityPriceCalculator(defaultPromotionPriceCalculator, priceCalculatorHelper, zapLogger)
-	memberConfigService := member.NewMemberConfigService(query)
-	pointGivePriceCalculator := calculators.NewPointGivePriceCalculator(memberConfigService, priceCalculatorHelper, zapLogger)
-	pointUsePriceCalculator := calculators.NewPointUsePriceCalculator(memberConfigService, memberUserService, priceCalculatorHelper, zapLogger)
-	rewardActivityService := promotion.NewRewardActivityService(query)
-	rewardActivityPriceCalculator := calculators.NewRewardActivityPriceCalculator(rewardActivityService, priceCalculatorHelper, zapLogger)
-	seckillConfigService := promotion.NewSeckillConfigService(query)
-	seckillActivityService := promotion.NewSeckillActivityService(query, seckillConfigService, productSpuService, productSkuService)
-	seckillActivityPriceCalculator := calculators.NewSeckillActivityPriceCalculator(seckillActivityService, priceCalculatorHelper, zapLogger)
-	v2 := ProvidePriceCalculators(bargainActivityPriceCalculator, combinationActivityPriceCalculator, couponPriceCalculator, deliveryPriceCalculator, discountActivityPriceCalculator, pointActivityPriceCalculator, pointGivePriceCalculator, pointUsePriceCalculator, rewardActivityPriceCalculator, seckillActivityPriceCalculator)
-	tradePriceService := trade.NewTradePriceService(v2, priceCalculatorHelper, productSkuService, productSpuService, rewardActivityService, discountActivityPriceCalculator, discountActivityService, memberUserService, memberLevelService, zapLogger)
-	cartService := trade.NewCartService(query, productSkuService, productSpuService)
-	tradeConfigService := trade.NewTradeConfigService(query)
-	tradeOrderLogRepository := repo.NewTradeOrderLogRepository(query)
-	tradeOrderLogService := trade.NewTradeOrderLogService(tradeOrderLogRepository)
-	tradeNoRedisDAO := trade2.NewTradeNoRedisDAO(redisClient)
-	tradeOrderUpdateService := trade.NewTradeOrderUpdateService(query, tradePriceService, cartService, memberAddressService, payOrderService, payRefundService, payAppService, tradeConfigService, productSkuService, productCommentService, couponUserService, memberUserService, tradeOrderLogService, tradeNoRedisDAO, zapLogger)
 	socialClientService := system.NewSocialClientService(query)
 	combinationRecordService := promotion.NewCombinationRecordService(query, combinationActivityService, memberUserService, productSpuService, productSkuService, tradeOrderUpdateService, socialClientService)
 	combinationActivityHandler := promotion2.NewCombinationActivityHandler(combinationActivityService, combinationRecordService, productSpuService)
 	combinationRecordHandler := promotion2.NewCombinationRecordHandler(combinationRecordService, combinationActivityService)
-	couponService := promotion.NewCouponService(query, memberUserService)
 	couponHandler := promotion2.NewCouponHandler(couponService)
 	discountActivityHandler := promotion2.NewDiscountActivityHandler(discountActivityService)
 	diyTemplateService := promotion.NewDiyTemplateService(query)
@@ -256,9 +269,7 @@ func InitApp() (*gin.Engine, error) {
 	deliveryPickUpStoreHandler := trade3.NewDeliveryPickUpStoreHandler(deliveryPickUpStoreService, zapLogger)
 	deliveryExpressTemplateHandler := trade3.NewDeliveryExpressTemplateHandler(deliveryExpressTemplateService, zapLogger)
 	tradeOrderHandler := trade3.NewTradeOrderHandler(tradeOrderUpdateService, tradeOrderQueryService, memberUserService, deliveryExpressTemplateService)
-	brokerageRecordService := brokerage.NewBrokerageRecordService(query, zapLogger, tradeConfigService, productSpuService, productSkuService)
 	brokerageRecordHandler := brokerage2.NewBrokerageRecordHandler(zapLogger, brokerageRecordService, memberUserService)
-	brokerageUserService := brokerage.NewBrokerageUserService(query, zapLogger, memberUserService, tradeConfigService)
 	brokerageUserHandler := brokerage2.NewBrokerageUserHandler(brokerageUserService, memberUserService, zapLogger)
 	payWalletTransactionService := wallet.NewPayWalletTransactionService(query)
 	payWalletService := wallet.NewPayWalletService(query, redisClient, payWalletTransactionService)
@@ -369,7 +380,7 @@ func InitApp() (*gin.Engine, error) {
 		System:     systemHandlers,
 	}
 	appProductBrowseHistoryHandler := product4.NewAppProductBrowseHistoryHandler(productBrowseHistoryService)
-	appCategoryHandler := product4.NewAppCategoryHandler(productProductCategoryService)
+	appCategoryHandler := product4.NewAppCategoryHandler(productCategoryService)
 	appProductCommentHandler := product4.NewAppProductCommentHandler(productCommentService)
 	appProductFavoriteHandler := product4.NewAppProductFavoriteHandler(productFavoriteService)
 	appProductSpuHandler := product4.NewAppProductSpuHandler(productSpuService, productPropertyService, productBrowseHistoryService, memberUserService, memberLevelService)
@@ -471,6 +482,14 @@ func ProvideJobHandlers(
 	h3 *job.PayOrderSyncJob,
 	h4 *job.PayOrderExpireJob,
 	h5 *job.PayRefundSyncJob,
+	h6 *job2.CouponExpireJob,
+	h7 *job3.JobLogCleanJob,
+	h8 *job3.ErrorLogCleanJob,
+	h9 *job3.AccessLogCleanJob,
+	h10 *job4.TradeOrderAutoCancelJob,
+	h11 *job4.TradeOrderAutoReceiveJob,
+	h12 *job4.TradeOrderAutoCommentJob,
+	h13 *job4.BrokerageRecordUnfreezeJob,
 ) []infra2.JobHandler {
-	return []infra2.JobHandler{h1, h2, h3, h4, h5}
+	return []infra2.JobHandler{h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13}
 }

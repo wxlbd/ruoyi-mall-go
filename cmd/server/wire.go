@@ -15,7 +15,9 @@ import (
 	payRepo "github.com/wxlbd/ruoyi-mall-go/internal/repo/pay"
 	tradeRepo "github.com/wxlbd/ruoyi-mall-go/internal/repo/trade"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/infra"
+	infraJob "github.com/wxlbd/ruoyi-mall-go/internal/service/infra/job"
 	iotSvc "github.com/wxlbd/ruoyi-mall-go/internal/service/iot"
+	promotionJob "github.com/wxlbd/ruoyi-mall-go/internal/service/mall/promotion/job"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/pay/job"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/system"
 
@@ -26,6 +28,7 @@ import (
 	tradeBrokerageSvc "github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade/brokerage"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade/calculators"
 	deliveryClient "github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade/delivery/client"
+	tradeJob "github.com/wxlbd/ruoyi-mall-go/internal/service/mall/trade/job"
 	memberSvc "github.com/wxlbd/ruoyi-mall-go/internal/service/member"
 	paySvc "github.com/wxlbd/ruoyi-mall-go/internal/service/pay"
 	"github.com/wxlbd/ruoyi-mall-go/internal/service/pay/client"
@@ -171,6 +174,14 @@ func InitApp() (*gin.Engine, error) {
 		job.NewPayOrderSyncJob,    // Added PayOrderSyncJob
 		job.NewPayOrderExpireJob,  // Added PayOrderExpireJob
 		job.NewPayRefundSyncJob,   // Added PayRefundSyncJob
+		promotionJob.NewCouponExpireJob,
+		infraJob.NewJobLogCleanJob,
+		infraJob.NewErrorLogCleanJob,
+		infraJob.NewAccessLogCleanJob,
+		tradeJob.NewTradeOrderAutoCancelJob,
+		tradeJob.NewTradeOrderAutoReceiveJob,
+		tradeJob.NewTradeOrderAutoCommentJob,
+		tradeJob.NewBrokerageRecordUnfreezeJob,
 
 		// Promotion
 		promotionSvc.NewCouponService,
@@ -294,6 +305,14 @@ func ProvideJobHandlers(
 	h3 *job.PayOrderSyncJob,
 	h4 *job.PayOrderExpireJob,
 	h5 *job.PayRefundSyncJob,
+	h6 *promotionJob.CouponExpireJob,
+	h7 *infraJob.JobLogCleanJob,
+	h8 *infraJob.ErrorLogCleanJob,
+	h9 *infraJob.AccessLogCleanJob,
+	h10 *tradeJob.TradeOrderAutoCancelJob,
+	h11 *tradeJob.TradeOrderAutoReceiveJob,
+	h12 *tradeJob.TradeOrderAutoCommentJob,
+	h13 *tradeJob.BrokerageRecordUnfreezeJob,
 ) []infra.JobHandler {
-	return []infra.JobHandler{h1, h2, h3, h4, h5}
+	return []infra.JobHandler{h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13}
 }
