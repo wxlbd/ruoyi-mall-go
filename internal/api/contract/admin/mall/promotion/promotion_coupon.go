@@ -54,9 +54,13 @@ type CouponTemplateUpdateReq struct {
 // CouponTemplatePageReq 优惠券模板分页 Request
 type CouponTemplatePageReq struct {
 	pagination.PageParam
-	Name       string       `form:"name"`
-	Status     *int32       `form:"status"`
-	CreateTime []*time.Time `form:"createTime"`
+	Name              string       `form:"name"`
+	Status            *int32       `form:"status"`
+	DiscountType      *int         `form:"discountType"`
+	CreateTime        []*time.Time `form:"createTime"`
+	CanTakeTypes      []int        `form:"canTakeTypes"`
+	ProductScope      *int         `form:"productScope"`
+	ProductScopeValue *int64       `form:"productScopeValue"`
 }
 
 // CouponPageReq 优惠券分页 Request

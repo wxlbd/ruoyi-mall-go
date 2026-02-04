@@ -133,6 +133,9 @@ func (h *SeckillActivityHandler) GetSeckillActivityPage(c *gin.Context) {
 		response.WriteError(c, 400, err.Error())
 		return
 	}
+
+	r.Status = response.NormalizeIntPtr(c, "status", r.Status)
+
 	res, err := h.svc.GetSeckillActivityPage(c.Request.Context(), &r)
 	if err != nil {
 		response.WriteBizError(c, err)

@@ -2,6 +2,7 @@ package promotion
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/samber/lo"
@@ -82,12 +83,41 @@ func (s *CouponService) UpdateCouponTemplate(ctx context.Context, req *promotion
 // GetCouponTemplatePage 获得优惠券模板分页 (Admin)
 func (s *CouponService) GetCouponTemplatePage(ctx context.Context, req *promotion3.CouponTemplatePageReq) (*pagination.PageResult[*promotion3.CouponTemplateResp], error) {
 	q := s.q.PromotionCouponTemplate.WithContext(ctx)
+
+	// 名称筛选 (去除前后空格)
 	if req.Name != "" {
-		q = q.Where(s.q.PromotionCouponTemplate.Name.Like("%" + req.Name + "%"))
+		trimmedName := strings.TrimSpace(req.Name)
+		if trimmedName != "" {
+			q = q.Where(s.q.PromotionCouponTemplate.Name.Like("%" + trimmedName + "%"))
+		}
 	}
+
+	// 状态筛选
 	if req.Status != nil {
 		q = q.Where(s.q.PromotionCouponTemplate.Status.Eq(int(*req.Status)))
 	}
+
+	// 优惠类型筛选
+	if req.DiscountType != nil {
+		q = q.Where(s.q.PromotionCouponTemplate.DiscountType.Eq(*req.DiscountType))
+	}
+
+	// 领取类型筛选
+	if len(req.CanTakeTypes) > 0 {
+		q = q.Where(s.q.PromotionCouponTemplate.TakeType.In(req.CanTakeTypes...))
+	}
+
+	// 商品范围筛选
+	if req.ProductScope != nil {
+		q = q.Where(s.q.PromotionCouponTemplate.ProductScope.Eq(*req.ProductScope))
+	}
+
+	if req.ProductScopeValue != nil {
+		// JSON_CONTAINS 需要原生 SQL，暂时跳过（前端未使用此筛选）
+		// TODO: 如需支持，可用 Clauses 或 Scopes
+	}
+
+	// 创建时间范围筛选
 	if len(req.CreateTime) == 2 && req.CreateTime[0] != nil && req.CreateTime[1] != nil {
 		q = q.Where(s.q.PromotionCouponTemplate.CreateTime.Between(*req.CreateTime[0], *req.CreateTime[1]))
 	}

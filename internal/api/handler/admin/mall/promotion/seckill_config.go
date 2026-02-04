@@ -92,6 +92,9 @@ func (h *SeckillConfigHandler) GetSeckillConfigPage(c *gin.Context) {
 		response.WriteError(c, 400, err.Error())
 		return
 	}
+
+	r.Status = response.NormalizeIntPtr(c, "status", r.Status)
+
 	res, err := h.svc.GetSeckillConfigPage(c.Request.Context(), &r)
 	if err != nil {
 		response.WriteBizError(c, err)
