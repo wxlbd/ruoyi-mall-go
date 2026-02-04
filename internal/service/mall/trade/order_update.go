@@ -732,6 +732,7 @@ func (s *TradeOrderUpdateService) buildTradeOrder(ctx context.Context, userId in
 	order.DeliveryPrice = priceResp.Price.DeliveryPrice
 	order.CouponPrice = priceResp.Price.CouponPrice
 	order.PointPrice = priceResp.Price.PointPrice
+	order.VipPrice = priceResp.Price.VipPrice
 	order.PayPrice = priceResp.Price.PayPrice
 	order.UsePoint = priceResp.UsePoint
 	order.GivePoint = priceResp.GivePoint
@@ -745,14 +746,18 @@ func (s *TradeOrderUpdateService) buildTradeOrder(ctx context.Context, userId in
 	switch createReq.DeliveryType {
 	case consts.DeliveryTypeExpress:
 		// 快递配送
+		var address *memberContract.AppAddressResp
 		if createReq.AddressID != nil && *createReq.AddressID > 0 {
-			address, _ := s.addressSvc.GetAddress(ctx, userId, *createReq.AddressID)
-			if address != nil {
-				order.ReceiverName = address.Name
-				order.ReceiverMobile = address.Mobile
-				order.ReceiverAreaID = int(address.AreaID)
-				order.ReceiverDetailAddress = address.DetailAddress
-			}
+			address, _ = s.addressSvc.GetAddress(ctx, userId, *createReq.AddressID)
+		}
+		if address == nil {
+			address, _ = s.addressSvc.GetDefaultAddress(ctx, userId)
+		}
+		if address != nil {
+			order.ReceiverName = address.Name
+			order.ReceiverMobile = address.Mobile
+			order.ReceiverAreaID = int(address.AreaID)
+			order.ReceiverDetailAddress = address.DetailAddress
 		}
 	case consts.DeliveryTypePickUp:
 		// 到店自提
@@ -803,6 +808,7 @@ func (s *TradeOrderUpdateService) buildTradeOrderItems(order *tradeModel.TradeOr
 			DeliveryPrice: item.DeliveryPrice,
 			CouponPrice:   item.CouponPrice,
 			PointPrice:    item.PointPrice,
+			VipPrice:      item.VipPrice,
 			PayPrice:      item.PayPrice,
 			UsePoint:      item.UsePoint,
 			GivePoint:     item.GivePoint,
