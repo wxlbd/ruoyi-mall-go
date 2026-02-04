@@ -17,6 +17,11 @@ func NewApiAccessLogService(q *query.Query) *ApiAccessLogService {
 	return &ApiAccessLogService{q: q}
 }
 
+// GetApiAccessLog 获取API访问日志详情
+func (s *ApiAccessLogService) GetApiAccessLog(ctx context.Context, id int64) (*model.InfraApiAccessLog, error) {
+	return s.q.InfraApiAccessLog.WithContext(ctx).Where(s.q.InfraApiAccessLog.ID.Eq(id)).First()
+}
+
 // GetApiAccessLogPage 获取API访问日志分页
 func (s *ApiAccessLogService) GetApiAccessLogPage(ctx context.Context, r *infra.ApiAccessLogPageReq) (*pagination.PageResult[*model.InfraApiAccessLog], error) {
 	q := s.q.InfraApiAccessLog.WithContext(ctx)

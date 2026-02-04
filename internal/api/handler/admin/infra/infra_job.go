@@ -69,6 +69,23 @@ func (h *JobHandler) DeleteJob(c *gin.Context) {
 	response.WriteSuccess(c, true)
 }
 
+// DeleteJobList 批量删除定时任务
+func (h *JobHandler) DeleteJobList(c *gin.Context) {
+	ids := utils.ParseIDs(c.QueryArray("ids"))
+	if len(ids) == 0 {
+		ids = utils.ParseIDs([]string{c.Query("ids")})
+	}
+	if len(ids) == 0 {
+		response.WriteBizError(c, errors.ErrParam)
+		return
+	}
+	if err := h.svc.DeleteJobList(c, ids); err != nil {
+		response.WriteBizError(c, err)
+		return
+	}
+	response.WriteSuccess(c, true)
+}
+
 // GetJob 获取定时任务
 func (h *JobHandler) GetJob(c *gin.Context) {
 	id := utils.ParseInt64(c.Query("id"))
@@ -156,8 +173,9 @@ func (h *JobHandler) ExportJobExcel(c *gin.Context) {
 		response.WriteBizError(c, errors.ErrParam)
 		return
 	}
-	// 设置为导出所有数据
-	r.PageSize = 0
+	// 导出全量（受当前过滤条件约束）
+	r.PageNo = 1
+	r.PageSize = 1000000
 	pageResult, err := h.svc.GetJobPage(c, &r)
 	if err != nil {
 		response.WriteBizError(c, err)

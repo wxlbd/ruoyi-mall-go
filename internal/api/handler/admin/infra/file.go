@@ -85,6 +85,30 @@ func (h *FileConfigHandler) DeleteFileConfig(c *gin.Context) {
 	response.WriteSuccess(c, true)
 }
 
+func (h *FileConfigHandler) DeleteFileConfigList(c *gin.Context) {
+	idsStr := c.Query("ids")
+	if idsStr == "" {
+		response.WriteBizError(c, errors.ErrParam)
+		return
+	}
+	var ids []int64
+	for _, s := range strings.Split(idsStr, ",") {
+		id, err := strconv.ParseInt(strings.TrimSpace(s), 10, 64)
+		if err == nil && id > 0 {
+			ids = append(ids, id)
+		}
+	}
+	if len(ids) == 0 {
+		response.WriteBizError(c, errors.ErrParam)
+		return
+	}
+	if err := h.svc.DeleteFileConfigList(c, ids); err != nil {
+		response.WriteBizError(c, err)
+		return
+	}
+	response.WriteSuccess(c, true)
+}
+
 func (h *FileConfigHandler) GetFileConfig(c *gin.Context) {
 	idStr := c.Query("id")
 	id, _ := strconv.ParseInt(idStr, 10, 64)
@@ -146,6 +170,9 @@ func (h *FileHandler) UploadFile(c *gin.Context) {
 		return
 	}
 	path := c.PostForm("path")
+	if path == "" {
+		path = c.PostForm("directory")
+	}
 
 	f, err := file.Open()
 	if err != nil {
@@ -238,8 +265,18 @@ func (h *FileHandler) GetFilePage(c *gin.Context) {
 func (h *FileHandler) GetFilePresignedUrl(c *gin.Context) {
 	path := c.Query("path")
 	if path == "" {
-		response.WriteBizError(c, errors.ErrParam)
-		return
+		name := c.Query("name")
+		directory := c.Query("directory")
+		if name == "" {
+			response.WriteBizError(c, errors.ErrParam)
+			return
+		}
+		var err error
+		path, err = h.svc.GenerateUploadPath(name, directory)
+		if err != nil {
+			response.WriteBizError(c, err)
+			return
+		}
 	}
 	res, err := h.svc.GetFilePresignedUrl(c, path)
 	if err != nil {

@@ -367,7 +367,9 @@ func RegisterSystemRoutes(engine *gin.Engine,
 				configProtectedGroup.POST("/create", casbinMiddleware.RequirePermission("system:config:create"), infraHandlers.Config.CreateConfig)
 				configProtectedGroup.PUT("/update", casbinMiddleware.RequirePermission("system:config:update"), infraHandlers.Config.UpdateConfig)
 				configProtectedGroup.DELETE("/delete", casbinMiddleware.RequirePermission("system:config:delete"), infraHandlers.Config.DeleteConfig)
+				configProtectedGroup.DELETE("/delete-list", casbinMiddleware.RequirePermission("system:config:delete"), infraHandlers.Config.DeleteConfigList)
 				configProtectedGroup.GET("/page", casbinMiddleware.RequirePermission("system:config:query"), infraHandlers.Config.GetConfigPage)
+				configProtectedGroup.GET("/export-excel", casbinMiddleware.RequirePermission("system:config:export"), infraHandlers.Config.ExportConfigExcel)
 			}
 		}
 
@@ -390,6 +392,7 @@ func RegisterSystemRoutes(engine *gin.Engine,
 				fileConfigGroup.PUT("/update", casbinMiddleware.RequirePermission("infra:file-config:update"), infraHandlers.FileConfig.UpdateFileConfig)
 				fileConfigGroup.PUT("/update-master", casbinMiddleware.RequirePermission("infra:file-config:update"), infraHandlers.FileConfig.UpdateFileConfigMaster)
 				fileConfigGroup.DELETE("/delete", casbinMiddleware.RequirePermission("infra:file-config:delete"), infraHandlers.FileConfig.DeleteFileConfig)
+				fileConfigGroup.DELETE("/delete-list", casbinMiddleware.RequirePermission("infra:file-config:delete"), infraHandlers.FileConfig.DeleteFileConfigList)
 				fileConfigGroup.GET("/page", casbinMiddleware.RequirePermission("infra:file-config:query"), infraHandlers.FileConfig.GetFileConfigPage)
 				fileConfigGroup.GET("/get", casbinMiddleware.RequirePermission("infra:file-config:query"), infraHandlers.FileConfig.GetFileConfig)
 				fileConfigGroup.GET("/test", casbinMiddleware.RequirePermission("infra:file-config:query"), infraHandlers.FileConfig.TestFileConfig)
@@ -415,6 +418,7 @@ func RegisterSystemRoutes(engine *gin.Engine,
 				jobGroup.PUT("/update", casbinMiddleware.RequirePermission("infra:job:update"), infraHandlers.Job.UpdateJob)
 				jobGroup.PUT("/update-status", casbinMiddleware.RequirePermission("infra:job:update"), infraHandlers.Job.UpdateJobStatus)
 				jobGroup.DELETE("/delete", casbinMiddleware.RequirePermission("infra:job:delete"), infraHandlers.Job.DeleteJob)
+				jobGroup.DELETE("/delete-list", casbinMiddleware.RequirePermission("infra:job:delete"), infraHandlers.Job.DeleteJobList)
 				jobGroup.GET("/get", casbinMiddleware.RequirePermission("infra:job:query"), infraHandlers.Job.GetJob)
 				jobGroup.GET("/page", casbinMiddleware.RequirePermission("infra:job:query"), infraHandlers.Job.GetJobPage)
 				jobGroup.PUT("/trigger", casbinMiddleware.RequirePermission("infra:job:trigger"), infraHandlers.Job.TriggerJob)
@@ -434,17 +438,36 @@ func RegisterSystemRoutes(engine *gin.Engine,
 			// API Access Log
 			apiAccessLogGroup := infraGroup.Group("/api-access-log")
 			{
+				apiAccessLogGroup.GET("/get", casbinMiddleware.RequirePermission("infra:api-access-log:query"), infraHandlers.ApiAccessLog.GetApiAccessLog)
 				apiAccessLogGroup.GET("/page", casbinMiddleware.RequirePermission("infra:api-access-log:query"), infraHandlers.ApiAccessLog.GetApiAccessLogPage)
+				apiAccessLogGroup.GET("/export-excel", casbinMiddleware.RequirePermission("infra:api-access-log:export"), infraHandlers.ApiAccessLog.ExportApiAccessLogExcel)
 			}
 
 			// API Error Log
 			apiErrorLogGroup := infraGroup.Group("/api-error-log")
 			{
+				apiErrorLogGroup.GET("/get", casbinMiddleware.RequirePermission("infra:api-error-log:query"), infraHandlers.ApiErrorLog.GetApiErrorLog)
 				apiErrorLogGroup.GET("/page", casbinMiddleware.RequirePermission("infra:api-error-log:query"), infraHandlers.ApiErrorLog.GetApiErrorLogPage)
+				apiErrorLogGroup.GET("/export-excel", casbinMiddleware.RequirePermission("infra:api-error-log:export"), infraHandlers.ApiErrorLog.ExportApiErrorLogExcel)
 				apiErrorLogGroup.PUT("/update-status", casbinMiddleware.RequirePermission("infra:api-error-log:update-status"), infraHandlers.ApiErrorLog.UpdateApiErrorLogProcess)
 				apiErrorLogGroup.PUT("/update-process", casbinMiddleware.RequirePermission("infra:api-error-log:update-process"), infraHandlers.ApiErrorLog.UpdateApiErrorLogProcess)
 			}
+
+			// Config
+			configGroup := infraGroup.Group("/config")
+			{
+				configGroup.GET("/get", casbinMiddleware.RequirePermission("infra:config:query"), infraHandlers.Config.GetConfig)
+				configGroup.POST("/create", casbinMiddleware.RequirePermission("infra:config:create"), infraHandlers.Config.CreateConfig)
+				configGroup.PUT("/update", casbinMiddleware.RequirePermission("infra:config:update"), infraHandlers.Config.UpdateConfig)
+				configGroup.DELETE("/delete", casbinMiddleware.RequirePermission("infra:config:delete"), infraHandlers.Config.DeleteConfig)
+				configGroup.DELETE("/delete-list", casbinMiddleware.RequirePermission("infra:config:delete"), infraHandlers.Config.DeleteConfigList)
+				configGroup.GET("/page", casbinMiddleware.RequirePermission("infra:config:query"), infraHandlers.Config.GetConfigPage)
+				configGroup.GET("/export-excel", casbinMiddleware.RequirePermission("infra:config:export"), infraHandlers.Config.ExportConfigExcel)
+			}
 		}
+
+		// 对齐 Java：该接口不要求特定权限
+		api.GET("/infra/config/get-value-by-key", infraHandlers.Config.GetConfigKey)
 	}
 }
 

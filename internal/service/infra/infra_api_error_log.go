@@ -18,6 +18,11 @@ func NewApiErrorLogService(q *query.Query) *ApiErrorLogService {
 	return &ApiErrorLogService{q: q}
 }
 
+// GetApiErrorLog 获取API错误日志详情
+func (s *ApiErrorLogService) GetApiErrorLog(ctx context.Context, id int64) (*model.InfraApiErrorLog, error) {
+	return s.q.InfraApiErrorLog.WithContext(ctx).Where(s.q.InfraApiErrorLog.ID.Eq(id)).First()
+}
+
 // GetApiErrorLogPage 获取API错误日志分页
 func (s *ApiErrorLogService) GetApiErrorLogPage(ctx context.Context, r *infra.ApiErrorLogPageReq) (*pagination.PageResult[*model.InfraApiErrorLog], error) {
 	q := s.q.InfraApiErrorLog.WithContext(ctx)

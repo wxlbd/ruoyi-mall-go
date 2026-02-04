@@ -100,6 +100,19 @@ func (s *FileConfigService) DeleteFileConfig(ctx context.Context, id int64) erro
 	return err
 }
 
+// DeleteFileConfigList 批量删除文件配置
+func (s *FileConfigService) DeleteFileConfigList(ctx context.Context, ids []int64) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	for _, id := range ids {
+		if err := s.DeleteFileConfig(ctx, id); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // GetFileConfig 获得文件配置
 func (s *FileConfigService) GetFileConfig(ctx context.Context, id int64) (*infra.FileConfigResp, error) {
 	c := s.q.InfraFileConfig

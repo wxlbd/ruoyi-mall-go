@@ -32,6 +32,17 @@ func NewFileService(q *query.Query, fileConfigService *FileConfigService) *FileS
 	}
 }
 
+// GenerateUploadPath 生成上传路径（用于预签名上传）
+func (s *FileService) GenerateUploadPath(name string, directory string) (string, error) {
+	if err := s.validateFileType(name); err != nil {
+		return "", err
+	}
+	if err := s.validatePath(directory); err != nil {
+		return "", err
+	}
+	return s.generateSafePath(name, directory), nil
+}
+
 // CreateFile 上传/创建文件
 func (s *FileService) CreateFile(ctx context.Context, name string, path string, content []byte, fileType string) (string, error) {
 	// 1. 获取 Master 配置

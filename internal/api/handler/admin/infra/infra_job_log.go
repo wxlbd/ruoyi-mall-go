@@ -90,8 +90,9 @@ func (h *JobLogHandler) ExportJobLogExcel(c *gin.Context) {
 		response.WriteBizError(c, errors.ErrParam)
 		return
 	}
-	// 设置为导出所有数据
-	r.PageSize = 0
+	// 导出全量（受当前过滤条件约束）
+	r.PageNo = 1
+	r.PageSize = 1000000
 	pageResult, err := h.svc.GetJobLogPage(c, &r)
 	if err != nil {
 		response.WriteBizError(c, err)

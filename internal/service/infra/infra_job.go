@@ -189,6 +189,19 @@ func (s *JobService) DeleteJob(ctx context.Context, id int64) error {
 	return err
 }
 
+// DeleteJobList 批量删除定时任务
+func (s *JobService) DeleteJobList(ctx context.Context, ids []int64) error {
+	for _, id := range ids {
+		if id <= 0 {
+			continue
+		}
+		if err := s.DeleteJob(ctx, id); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // GetJob 获取定时任务
 func (s *JobService) GetJob(ctx context.Context, id int64) (*model.InfraJob, error) {
 	return s.q.InfraJob.WithContext(ctx).Where(s.q.InfraJob.ID.Eq(id)).First()
